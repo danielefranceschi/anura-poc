@@ -1,0 +1,140 @@
+// Copyright 2020 The Gitea Authors. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+package doctor
+
+import (
+	"context"
+
+	"code.gitea.io/gitea/models/db"
+	"code.gitea.io/gitea/modules/log"
+	"code.gitea.io/gitea/modules/setting"
+)
+
+type consistencyCheck struct {
+	Name         string
+	Counter      func(context.Context) (int64, error)
+	Fixer        func(context.Context) (int64, error)
+	FixedMessage string
+}
+
+func (c *consistencyCheck) Run(ctx context.Context, logger log.Logger, autofix bool) error {
+	count, err := c.Counter(ctx)
+	if err != nil {
+		logger.Critical("Error: %v whilst counting %s", err, c.Name)
+		return err
+	}
+	if count > 0 {
+		if autofix {
+			var fixed int64
+			if fixed, err = c.Fixer(ctx); err != nil {
+				logger.Critical("Error: %v whilst fixing %s", err, c.Name)
+				return err
+			}
+
+			prompt := "Deleted"
+			if c.FixedMessage != "" {
+				prompt = c.FixedMessage
+			}
+
+			if fixed < 0 {
+				logger.Info(prompt+" %d %s", count, c.Name)
+			} else {
+				logger.Info(prompt+" %d/%d %s", fixed, count, c.Name)
+			}
+		} else {
+			logger.Warn("Found %d %s", count, c.Name)
+		}
+	}
+	return nil
+}
+
+func asFixer(fn func(ctx context.Context) error) func(ctx context.Context) (int64, error) {
+	return func(ctx context.Context) (int64, error) {
+		err := fn(ctx)
+		return -1, err
+	}
+}
+
+func genericOrphanCheck(name, subject, refObject, joinCond string) consistencyCheck {
+	return consistencyCheck{
+		Name: name,
+		Counter: func(ctx context.Context) (int64, error) {
+			return db.CountOrphanedObjects(ctx, subject, refObject, joinCond)
+		},
+		Fixer: func(ctx context.Context) (int64, error) {
+			err := db.DeleteOrphanedObjects(ctx, subject, refObject, joinCond)
+			return -1, err
+		},
+	}
+}
+
+func prepareDBConsistencyChecks() []consistencyCheck {
+	consistencyChecks := []consistencyCheck{
+		// find releases without existing repository
+		genericOrphanCheck("Orphaned Releases without existing repository",
+			"release", "repository", "`release`.repo_id=repository.id"),
+		// find pulls without existing issues
+		// {
+		// 	Name:         "Action with created_unix set as an empty string",
+		// 	Counter:      activities_model.CountActionCreatedUnixString,
+		// 	Fixer:        activities_model.FixActionCreatedUnixString,
+		// 	FixedMessage: "Set to zero",
+		// },
+	}
+
+	// TODO: function to recalc all counters
+
+	if setting.Database.Type.IsPostgreSQL() {
+		consistencyChecks = append(consistencyChecks, consistencyCheck{
+			Name:         "Sequence values",
+			Counter:      db.CountBadSequences,
+			Fixer:        asFixer(db.FixBadSequences),
+			FixedMessage: "Updated",
+		})
+	}
+
+	consistencyChecks = append(consistencyChecks,
+		// find access without users
+		genericOrphanCheck("Access entries without existing user",
+			"access", "user", "access.user_id=`user`.id"),
+		// find access without repository
+		// find OAuth2Grant without existing user
+		genericOrphanCheck("Orphaned OAuth2Grant without existing User",
+			"oauth2_grant", "user", "oauth2_grant.user_id=`user`.id"),
+		// find OAuth2Application without existing user
+		genericOrphanCheck("Orphaned OAuth2Application without existing User",
+			"oauth2_application", "user", "oauth2_application.uid=0 OR oauth2_application.uid=`user`.id"),
+		// find OAuth2AuthorizationCode without existing OAuth2Grant
+		genericOrphanCheck("Orphaned OAuth2AuthorizationCode without existing OAuth2Grant",
+			"oauth2_authorization_code", "oauth2_grant", "oauth2_authorization_code.grant_id=oauth2_grant.id"),
+		// find stopwatches without existing user
+	)
+	return consistencyChecks
+}
+
+func checkDBConsistency(ctx context.Context, logger log.Logger, autofix bool) error {
+	// make sure DB version is uptodate
+	// if err := db.InitEngineWithMigration(ctx, migrations.EnsureUpToDate); err != nil {
+	// 	logger.Critical("Model version on the database does not match the current Gitea version. Model consistency will not be checked until the database is upgraded")
+	// 	return err
+	// }
+	consistencyChecks := prepareDBConsistencyChecks()
+	for _, c := range consistencyChecks {
+		if err := c.Run(ctx, logger, autofix); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func init() {
+	Register(&Check{
+		Title:     "Check consistency of database",
+		Name:      "check-db-consistency",
+		IsDefault: false,
+		Run:       checkDBConsistency,
+		Priority:  3,
+	})
+}

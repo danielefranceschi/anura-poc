@@ -1,0 +1,18 @@
+{{$size := 20}}
+{{if .Size}}
+	{{$size = .Size}}
+{{end}}
+<div class="menu">
+	<a class="item" href="{{.BaseLinkNew}}/slack/new">
+		{{template "shared/webhook/icon" (dict "HookType" "slack" "Size" $size)}}
+		{{ctx.Locale.Tr "repo.settings.web_hook_name_slack"}}
+	</a>
+	<a class="item" href="{{.BaseLinkNew}}/discord/new">
+		{{template "shared/webhook/icon" (dict "HookType" "discord" "Size" $size)}}
+		{{ctx.Locale.Tr "repo.settings.web_hook_name_discord"}}
+	</a>
+	<a class="item" href="{{.BaseLinkNew}}/msteams/new">
+		{{template "shared/webhook/icon" (dict "HookType" "msteams" "Size" $size)}}
+		{{ctx.Locale.Tr "repo.settings.web_hook_name_msteams"}}
+	</a>
+</div>

@@ -1,0 +1,56 @@
+{{template "user/settings/layout_head" (dict "ctxData" . "pageClass" "user settings")}}
+	<div class="user-setting-content">
+
+		<!-- Theme -->
+		<h4 class="ui top attached header">
+			{{ctx.Locale.Tr "settings.manage_themes"}}
+		</h4>
+		<div class="ui attached segment">
+			<form class="ui form" action="{{.Link}}/theme" method="post">
+				{{.CsrfTokenHtml}}
+				<div class="field">
+					{{ctx.Locale.Tr "settings.theme_desc"}}
+					<a class="muted" target="_blank" href="https://github.com/go-gitea/gitea/blob/main/web_src/css/themes/" data-tooltip-content="{{ctx.Locale.Tr "settings.theme_colorblindness_prompt"}}">
+						{{svg "octicon-question"}} {{ctx.Locale.Tr "settings.theme_colorblindness_help"}}
+					</a>
+				</div>
+				<div class="field">
+					<label>{{ctx.Locale.Tr "settings.ui"}}</label>
+					<select name="theme" class="ui dropdown">
+						{{range $theme := .AllThemes}}
+						<option value="{{$theme}}" {{Iif (eq $.SignedUser.Theme $theme) "selected"}}>{{$theme}}</option>
+						{{end}}
+					</select>
+				</div>
+				<div class="field">
+					<button class="ui primary button">{{ctx.Locale.Tr "settings.update_theme"}}</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- Language -->
+		<h4 class="ui top attached header">
+			{{ctx.Locale.Tr "settings.language"}}
+		</h4>
+		<div class="ui attached segment">
+			<form class="ui form" action="{{.Link}}/language" method="post">
+				{{.CsrfTokenHtml}}
+				<div class="field">
+					<div class="ui language selection dropdown" id="language">
+						<input name="language" type="hidden" value="{{.SignedUser.Language}}">
+						{{svg "octicon-triangle-down" 14 "dropdown icon"}}
+						<div class="text">{{range .AllLangs}}{{if eq $.SignedUser.Language .Lang}}{{.Name}}{{end}}{{end}}</div>
+						<div class="menu">
+						{{range .AllLangs}}
+							<div class="item{{if eq $.SignedUser.Language .Lang}} active selected{{end}}" data-value="{{.Lang}}">{{.Name}}</div>
+						{{end}}
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<button class="ui primary button">{{ctx.Locale.Tr "settings.update_language"}}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{{template "user/settings/layout_footer" .}}
