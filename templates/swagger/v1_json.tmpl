@@ -6552,174 +6552,6 @@
         }
       }
     },
-    "/repos/{owner}/{repo}/hooks/git": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "repository"
-        ],
-        "summary": "List the Git hooks in a repository",
-        "operationId": "repoListGitHooks",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "owner of the repo",
-            "name": "owner",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "name of the repo",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/GitHookList"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      }
-    },
-    "/repos/{owner}/{repo}/hooks/git/{id}": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "repository"
-        ],
-        "summary": "Get a Git hook",
-        "operationId": "repoGetGitHook",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "owner of the repo",
-            "name": "owner",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "name of the repo",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of the hook to get",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/GitHook"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      },
-      "delete": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "repository"
-        ],
-        "summary": "Delete a Git hook in a repository",
-        "operationId": "repoDeleteGitHook",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "owner of the repo",
-            "name": "owner",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "name of the repo",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of the hook to get",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/empty"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      },
-      "patch": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "repository"
-        ],
-        "summary": "Edit a Git hook in a repository",
-        "operationId": "repoEditGitHook",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "owner of the repo",
-            "name": "owner",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "name of the repo",
-            "name": "repo",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "id of the hook to get",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/EditGitHookOption"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/GitHook"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      }
-    },
     "/repos/{owner}/{repo}/hooks/{id}": {
       "get": {
         "produces": [
@@ -16503,145 +16335,6 @@
         }
       }
     },
-    "/user/followers": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "user"
-        ],
-        "summary": "List the authenticated user's followers",
-        "operationId": "userCurrentListFollowers",
-        "parameters": [
-          {
-            "type": "integer",
-            "description": "page number of results to return (1-based)",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "description": "page size of results",
-            "name": "limit",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/UserList"
-          }
-        }
-      }
-    },
-    "/user/following": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "user"
-        ],
-        "summary": "List the users that the authenticated user is following",
-        "operationId": "userCurrentListFollowing",
-        "parameters": [
-          {
-            "type": "integer",
-            "description": "page number of results to return (1-based)",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "description": "page size of results",
-            "name": "limit",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/UserList"
-          }
-        }
-      }
-    },
-    "/user/following/{username}": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Check whether a user is followed by the authenticated user",
-        "operationId": "userCurrentCheckFollowing",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "username of followed user",
-            "name": "username",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/empty"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Follow a user",
-        "operationId": "userCurrentPutFollow",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "username of user to follow",
-            "name": "username",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/empty"
-          },
-          "403": {
-            "$ref": "#/responses/forbidden"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Unfollow a user",
-        "operationId": "userCurrentDeleteFollow",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "username of user to unfollow",
-            "name": "username",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/empty"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      }
-    },
     "/user/gpg_key_token": {
       "get": {
         "produces": [
@@ -17634,121 +17327,6 @@
         "responses": {
           "200": {
             "$ref": "#/responses/ActivityFeedsList"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      }
-    },
-    "/users/{username}/followers": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "user"
-        ],
-        "summary": "List the given user's followers",
-        "operationId": "userListFollowers",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "username of user",
-            "name": "username",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "integer",
-            "description": "page number of results to return (1-based)",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "description": "page size of results",
-            "name": "limit",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/UserList"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      }
-    },
-    "/users/{username}/following": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "user"
-        ],
-        "summary": "List the users that the given user is following",
-        "operationId": "userListFollowing",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "username of user",
-            "name": "username",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "integer",
-            "description": "page number of results to return (1-based)",
-            "name": "page",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "description": "page size of results",
-            "name": "limit",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/UserList"
-          },
-          "404": {
-            "$ref": "#/responses/notFound"
-          }
-        }
-      }
-    },
-    "/users/{username}/following/{target}": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Check if one user is following another user",
-        "operationId": "userCheckFollowing",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "username of following user",
-            "name": "username",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "username of followed user",
-            "name": "target",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/empty"
           },
           "404": {
             "$ref": "#/responses/notFound"
@@ -20752,17 +20330,6 @@
       },
       "x-go-package": "code.gitea.io/gitea/modules/structs"
     },
-    "EditGitHookOption": {
-      "description": "EditGitHookOption options when modifying one Git hook",
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "x-go-name": "Content"
-        }
-      },
-      "x-go-package": "code.gitea.io/gitea/modules/structs"
-    },
     "EditHookOption": {
       "description": "EditHookOption options when modify one hook",
       "type": "object",
@@ -21328,18 +20895,6 @@
           "type": "boolean",
           "x-go-name": "Admin"
         },
-        "allow_create_organization": {
-          "type": "boolean",
-          "x-go-name": "AllowCreateOrganization"
-        },
-        "allow_git_hook": {
-          "type": "boolean",
-          "x-go-name": "AllowGitHook"
-        },
-        "allow_import_local": {
-          "type": "boolean",
-          "x-go-name": "AllowImportLocal"
-        },
         "description": {
           "type": "string",
           "x-go-name": "Description"
@@ -21361,11 +20916,6 @@
           "type": "string",
           "x-go-name": "LoginName"
         },
-        "max_repo_creation": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "MaxRepoCreation"
-        },
         "must_change_password": {
           "type": "boolean",
           "x-go-name": "MustChangePassword"
@@ -21378,18 +20928,10 @@
           "type": "boolean",
           "x-go-name": "ProhibitLogin"
         },
-        "restricted": {
-          "type": "boolean",
-          "x-go-name": "Restricted"
-        },
         "source_id": {
           "type": "integer",
           "format": "int64",
           "x-go-name": "SourceID"
-        },
-        "visibility": {
-          "type": "string",
-          "x-go-name": "Visibility"
         },
         "website": {
           "type": "string",
@@ -21800,11 +21342,6 @@
           "type": "boolean",
           "x-go-name": "GitContent"
         },
-        "git_hooks": {
-          "description": "include git hooks in template repo",
-          "type": "boolean",
-          "x-go-name": "GitHooks"
-        },
         "labels": {
           "description": "include labels in template repo",
           "type": "boolean",
@@ -21900,25 +21437,6 @@
         "url": {
           "type": "string",
           "x-go-name": "URL"
-        }
-      },
-      "x-go-package": "code.gitea.io/gitea/modules/structs"
-    },
-    "GitHook": {
-      "description": "GitHook represents a Git repository hook",
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "x-go-name": "Content"
-        },
-        "is_active": {
-          "type": "boolean",
-          "x-go-name": "IsActive"
-        },
-        "name": {
-          "type": "string",
-          "x-go-name": "Name"
         }
       },
       "x-go-package": "code.gitea.io/gitea/modules/structs"
@@ -24899,17 +24417,6 @@
           "format": "email",
           "x-go-name": "Email"
         },
-        "followers_count": {
-          "description": "user counts",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Followers"
-        },
-        "following_count": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Following"
-        },
         "full_name": {
           "description": "the user's full name",
           "type": "string",
@@ -24962,26 +24469,11 @@
           "type": "boolean",
           "x-go-name": "ProhibitLogin"
         },
-        "restricted": {
-          "description": "Is user restricted",
-          "type": "boolean",
-          "x-go-name": "Restricted"
-        },
         "source_id": {
           "description": "The ID of the user's Authentication Source",
           "type": "integer",
           "format": "int64",
           "x-go-name": "SourceID"
-        },
-        "starred_repos_count": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "StarredRepos"
-        },
-        "visibility": {
-          "description": "User visibility level option: public, limited, private",
-          "type": "string",
-          "x-go-name": "Visibility"
         },
         "website": {
           "description": "the user's website",
@@ -25032,10 +24524,6 @@
           "type": "string",
           "x-go-name": "Description"
         },
-        "diff_view_style": {
-          "type": "string",
-          "x-go-name": "DiffViewStyle"
-        },
         "full_name": {
           "type": "string",
           "x-go-name": "FullName"
@@ -25075,10 +24563,6 @@
         "description": {
           "type": "string",
           "x-go-name": "Description"
-        },
-        "diff_view_style": {
-          "type": "string",
-          "x-go-name": "DiffViewStyle"
         },
         "full_name": {
           "type": "string",
@@ -25576,21 +25060,6 @@
       "description": "GitBlobResponse",
       "schema": {
         "$ref": "#/definitions/GitBlobResponse"
-      }
-    },
-    "GitHook": {
-      "description": "GitHook",
-      "schema": {
-        "$ref": "#/definitions/GitHook"
-      }
-    },
-    "GitHookList": {
-      "description": "GitHookList",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/GitHook"
-        }
       }
     },
     "GitTreeResponse": {

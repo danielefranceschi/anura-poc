@@ -11,7 +11,6 @@ import (
 	"code.gitea.io/gitea/models/db"
 	"code.gitea.io/gitea/modules/container"
 	"code.gitea.io/gitea/modules/optional"
-	"code.gitea.io/gitea/modules/structs"
 
 	"xorm.io/builder"
 	"xorm.io/xorm"
@@ -27,7 +26,6 @@ type SearchUserOptions struct {
 	LoginName     string // this option should be used only for admin user
 	SourceID      int64  // this option should be used only for admin user
 	OrderBy       db.SearchOrderBy
-	Visible       []structs.VisibleType
 	Actor         *User // The user doing the search
 	SearchByEmail bool  // Search by email as well as username/full name
 
@@ -35,7 +33,6 @@ type SearchUserOptions struct {
 
 	IsActive           optional.Option[bool]
 	IsAdmin            optional.Option[bool]
-	IsRestricted       optional.Option[bool]
 	IsTwoFactorEnabled optional.Option[bool]
 	IsProhibitLogin    optional.Option[bool]
 	IncludeReserved    bool
@@ -69,11 +66,6 @@ func (opts *SearchUserOptions) toSearchQueryBase(ctx context.Context) *xorm.Sess
 		cond = cond.And(keywordCond)
 	}
 
-	// If visibility filtered
-	if len(opts.Visible) > 0 {
-		cond = cond.And(builder.In("visibility", opts.Visible))
-	}
-
 	cond = cond.And(BuildCanSeeUserCondition(opts.Actor))
 
 	if opts.UID > 0 {
@@ -93,10 +85,6 @@ func (opts *SearchUserOptions) toSearchQueryBase(ctx context.Context) *xorm.Sess
 
 	if opts.IsAdmin.Has() {
 		cond = cond.And(builder.Eq{"is_admin": opts.IsAdmin.Value()})
-	}
-
-	if opts.IsRestricted.Has() {
-		cond = cond.And(builder.Eq{"is_restricted": opts.IsRestricted.Value()})
 	}
 
 	if opts.IsProhibitLogin.Has() {
@@ -153,20 +141,14 @@ func BuildCanSeeUserCondition(actor *User) builder.Cond {
 	if actor != nil {
 		// If Admin - they see all users!
 		if !actor.IsAdmin {
-			// Users can see an organization they are a member of
-			cond := builder.In("`user`.id", builder.Select("org_id").From("org_user").Where(builder.Eq{"uid": actor.ID}))
-			if !actor.IsRestricted {
-				// Not-Restricted users can see public and limited users/organizations
-				cond = cond.Or(builder.In("`user`.visibility", structs.VisibleTypePublic, structs.VisibleTypeLimited))
-			}
 			// Don't forget about self
-			return cond.Or(builder.Eq{"`user`.id": actor.ID})
+			return builder.Eq{"`user`.id": actor.ID}
 		}
 
 		return nil
 	}
 
 	// Force visibility for privacy
-	// Not logged in - only public users
-	return builder.In("`user`.visibility", structs.VisibleTypePublic)
+	// Not logged in - no users
+	return builder.IsNull{"`user`.id"}
 }

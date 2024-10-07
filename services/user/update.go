@@ -5,7 +5,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"code.gitea.io/gitea/models"
 	auth_model "code.gitea.io/gitea/models/auth"
@@ -13,24 +12,19 @@ import (
 	password_module "code.gitea.io/gitea/modules/auth/password"
 	"code.gitea.io/gitea/modules/optional"
 	"code.gitea.io/gitea/modules/setting"
-	"code.gitea.io/gitea/modules/structs"
 )
 
 type UpdateOptions struct {
-	KeepEmailPrivate    optional.Option[bool]
-	FullName            optional.Option[string]
-	Website             optional.Option[string]
-	Location            optional.Option[string]
-	Description         optional.Option[string]
-	IsRestricted        optional.Option[bool]
-	Visibility          optional.Option[structs.VisibleType]
-	KeepActivityPrivate optional.Option[bool]
-	Language            optional.Option[string]
-	Theme               optional.Option[string]
-	DiffViewStyle       optional.Option[string]
-	IsActive            optional.Option[bool]
-	IsAdmin             optional.Option[bool]
-	SetLastLogin        bool
+	KeepEmailPrivate optional.Option[bool]
+	FullName         optional.Option[string]
+	Website          optional.Option[string]
+	Location         optional.Option[string]
+	Description      optional.Option[string]
+	Language         optional.Option[string]
+	Theme            optional.Option[string]
+	IsActive         optional.Option[bool]
+	IsAdmin          optional.Option[bool]
+	SetLastLogin     bool
 }
 
 func UpdateUser(ctx context.Context, u *user_model.User, opts *UpdateOptions) error {
@@ -72,22 +66,13 @@ func UpdateUser(ctx context.Context, u *user_model.User, opts *UpdateOptions) er
 
 		cols = append(cols, "theme")
 	}
-	if opts.DiffViewStyle.Has() {
-		u.DiffViewStyle = opts.DiffViewStyle.Value()
-
-		cols = append(cols, "diff_view_style")
-	}
 
 	if opts.IsActive.Has() {
 		u.IsActive = opts.IsActive.Value()
 
 		cols = append(cols, "is_active")
 	}
-	if opts.IsRestricted.Has() {
-		u.IsRestricted = opts.IsRestricted.Value()
 
-		cols = append(cols, "is_restricted")
-	}
 	if opts.IsAdmin.Has() {
 		if !opts.IsAdmin.Value() && user_model.IsLastAdminUser(ctx, u) {
 			return models.ErrDeleteLastAdminUser{UID: u.ID}
@@ -96,20 +81,6 @@ func UpdateUser(ctx context.Context, u *user_model.User, opts *UpdateOptions) er
 		u.IsAdmin = opts.IsAdmin.Value()
 
 		cols = append(cols, "is_admin")
-	}
-
-	if opts.Visibility.Has() {
-		if !setting.Service.AllowedUserVisibilityModesSlice.IsAllowedVisibility(opts.Visibility.Value()) {
-			return fmt.Errorf("visibility mode not allowed: %s", opts.Visibility.Value().String())
-		}
-		u.Visibility = opts.Visibility.Value()
-
-		cols = append(cols, "visibility")
-	}
-	if opts.KeepActivityPrivate.Has() {
-		u.KeepActivityPrivate = opts.KeepActivityPrivate.Value()
-
-		cols = append(cols, "keep_activity_private")
 	}
 
 	if opts.SetLastLogin {

@@ -20,10 +20,6 @@ const (
 	SearchOrderByNewest                SearchOrderBy = "created_unix DESC"
 	SearchOrderByID                    SearchOrderBy = "id ASC"
 	SearchOrderByIDReverse             SearchOrderBy = "id DESC"
-	SearchOrderByStars                 SearchOrderBy = "num_stars ASC"
-	SearchOrderByStarsReverse          SearchOrderBy = "num_stars DESC"
-	SearchOrderByForks                 SearchOrderBy = "num_forks ASC"
-	SearchOrderByForksReverse          SearchOrderBy = "num_forks DESC"
 )
 
 const (

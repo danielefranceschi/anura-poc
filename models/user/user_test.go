@@ -19,7 +19,6 @@ import (
 	"code.gitea.io/gitea/modules/container"
 	"code.gitea.io/gitea/modules/optional"
 	"code.gitea.io/gitea/modules/setting"
-	"code.gitea.io/gitea/modules/structs"
 	"code.gitea.io/gitea/modules/timeutil"
 
 	"github.com/stretchr/testify/assert"
@@ -80,9 +79,6 @@ func TestSearchUsers(t *testing.T) {
 
 	testUserSuccess(&user_model.SearchUserOptions{ListOptions: db.ListOptions{Page: 1}, IsAdmin: optional.Some(true)},
 		[]int64{1})
-
-	testUserSuccess(&user_model.SearchUserOptions{ListOptions: db.ListOptions{Page: 1}, IsRestricted: optional.Some(true)},
-		[]int64{29})
 
 	testUserSuccess(&user_model.SearchUserOptions{ListOptions: db.ListOptions{Page: 1}, IsProhibitLogin: optional.Some(true)},
 		[]int64{37})
@@ -237,25 +233,6 @@ func TestGetUserIDsByNames(t *testing.T) {
 	assert.Equal(t, []int64(nil), IDs)
 }
 
-func TestGetMaileableUsersByIDs(t *testing.T) {
-	assert.NoError(t, unittest.PrepareTestDatabase())
-
-	results, err := user_model.GetMaileableUsersByIDs(db.DefaultContext, []int64{1, 4}, false)
-	assert.NoError(t, err)
-	assert.Len(t, results, 1)
-	if len(results) > 1 {
-		assert.Equal(t, results[0].ID, 1)
-	}
-
-	results, err = user_model.GetMaileableUsersByIDs(db.DefaultContext, []int64{1, 4}, true)
-	assert.NoError(t, err)
-	assert.Len(t, results, 2)
-	if len(results) > 2 {
-		assert.Equal(t, results[0].ID, 1)
-		assert.Equal(t, results[1].ID, 4)
-	}
-}
-
 func TestNewUserRedirect(t *testing.T) {
 	// redirect to a completely new name
 	assert.NoError(t, unittest.PrepareTestDatabase())
@@ -319,109 +296,6 @@ func TestGetUserByOpenID(t *testing.T) {
 	user, err = user_model.GetUserByOpenID(db.DefaultContext, "https://domain1.tld/user2/")
 	if assert.NoError(t, err) {
 		assert.Equal(t, int64(2), user.ID)
-	}
-}
-
-func TestFollowUser(t *testing.T) {
-	assert.NoError(t, unittest.PrepareTestDatabase())
-
-	testSuccess := func(follower, followed *user_model.User) {
-		assert.NoError(t, user_model.FollowUser(db.DefaultContext, follower, followed))
-		unittest.AssertExistsAndLoadBean(t, &user_model.Follow{UserID: follower.ID, FollowID: followed.ID})
-	}
-
-	user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
-	user4 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4})
-	user5 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 5})
-
-	testSuccess(user4, user2)
-	testSuccess(user5, user2)
-
-	assert.NoError(t, user_model.FollowUser(db.DefaultContext, user2, user2))
-
-	unittest.CheckConsistencyFor(t, &user_model.User{})
-}
-
-func TestUnfollowUser(t *testing.T) {
-	assert.NoError(t, unittest.PrepareTestDatabase())
-
-	testSuccess := func(followerID, followedID int64) {
-		assert.NoError(t, user_model.UnfollowUser(db.DefaultContext, followerID, followedID))
-		unittest.AssertNotExistsBean(t, &user_model.Follow{UserID: followerID, FollowID: followedID})
-	}
-	testSuccess(4, 2)
-	testSuccess(5, 2)
-	testSuccess(2, 2)
-
-	unittest.CheckConsistencyFor(t, &user_model.User{})
-}
-
-func TestIsUserVisibleToViewer(t *testing.T) {
-	assert.NoError(t, unittest.PrepareTestDatabase())
-
-	user1 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 1})   // admin, public
-	user4 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 4})   // normal, public
-	user20 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 20}) // public, same team as user31
-	user29 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 29}) // public, is restricted
-	user31 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 31}) // private, same team as user20
-	user33 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 33}) // limited, follows 31
-
-	test := func(u, viewer *user_model.User, expected bool) {
-		name := func(u *user_model.User) string {
-			if u == nil {
-				return "<nil>"
-			}
-			return u.Name
-		}
-		assert.Equal(t, expected, user_model.IsUserVisibleToViewer(db.DefaultContext, u, viewer), "user %v should be visible to viewer %v: %v", name(u), name(viewer), expected)
-	}
-
-	// admin viewer
-	test(user1, user1, true)
-	test(user20, user1, true)
-	test(user31, user1, true)
-	test(user33, user1, true)
-
-	// non admin viewer
-	test(user4, user4, true)
-	test(user20, user4, true)
-	test(user31, user4, false)
-	test(user33, user4, true)
-	test(user4, nil, true)
-
-	// public user
-	test(user4, user20, true)
-	test(user4, user31, true)
-	test(user4, user33, true)
-
-	// limited user
-	test(user33, user33, true)
-	test(user33, user4, true)
-	test(user33, user29, false)
-	test(user33, nil, false)
-
-	// private user
-	test(user31, user31, true)
-	test(user31, user4, false)
-	test(user31, user20, true)
-	test(user31, user29, false)
-	test(user31, user33, true)
-	test(user31, nil, false)
-}
-
-func Test_ValidateUser(t *testing.T) {
-	oldSetting := setting.Service.AllowedUserVisibilityModesSlice
-	defer func() {
-		setting.Service.AllowedUserVisibilityModesSlice = oldSetting
-	}()
-	setting.Service.AllowedUserVisibilityModesSlice = []bool{true, false, true}
-	kases := map[*user_model.User]bool{
-		{ID: 1, Visibility: structs.VisibleTypePublic}:  true,
-		{ID: 2, Visibility: structs.VisibleTypeLimited}: false,
-		{ID: 2, Visibility: structs.VisibleTypePrivate}: true,
-	}
-	for kase, expected := range kases {
-		assert.EqualValues(t, expected, nil == user_model.ValidateUser(kase), fmt.Sprintf("case: %+v", kase))
 	}
 }
 

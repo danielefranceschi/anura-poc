@@ -18,21 +18,9 @@
 						{{svg "octicon-gear" 18}}
 					</a>
 				{{end}}</span>
-		<div class="tw-mt-2">
-			<a class="muted" href="{{.ContextUser.HomeLink}}?tab=followers">{{svg "octicon-person" 18 "tw-mr-1"}}{{.NumFollowers}} {{ctx.Locale.Tr "user.followers"}}</a> · <a class="muted" href="{{.ContextUser.HomeLink}}?tab=following">{{.NumFollowing}} {{ctx.Locale.Tr "user.following"}}</a>
-			{{if .EnableFeed}}
-				<a href="{{.ContextUser.HomeLink}}.rss"><i class="ui text grey tw-ml-2" data-tooltip-content="{{ctx.Locale.Tr "rss_feed"}}">{{svg "octicon-rss" 18}}</i></a>
-			{{end}}
-		</div>
 	</div>
 	<div class="extra content tw-break-anywhere">
 		<ul>
-			{{if .UserBlocking}}
-				<li class="text red">{{svg "octicon-circle-slash"}} {{ctx.Locale.Tr "user.block.blocked"}}</li>
-				{{if .UserBlocking.Note}}
-					<li class="text small red">{{ctx.Locale.Tr "user.block.note"}}: {{.UserBlocking.Note}}</li>
-				{{end}}
-			{{end}}
 			{{if .ContextUser.Location}}
 				<li>
 					{{svg "octicon-location"}}
@@ -80,34 +68,6 @@
 				{{end}}
 			{{end}}
 			<li>{{svg "octicon-calendar"}} <span>{{ctx.Locale.Tr "user.joined_on" (DateTime "short" .ContextUser.CreatedUnix)}}</span></li>
-			{{if and .Orgs .HasOrgsVisible}}
-			<li>
-				<ul class="user-orgs">
-				{{range .Orgs}}
-					{{if (or .Visibility.IsPublic (and ($.SignedUser) (or .Visibility.IsLimited (and (.HasMemberWithUserID ctx $.SignedUserID) .Visibility.IsPrivate) ($.IsAdmin))))}}
-					<li>
-						<a href="{{.HomeLink}}" data-tooltip-content="{{.Name}}">
-							{{ctx.AvatarUtils.Avatar .}}
-						</a>
-					</li>
-					{{end}}
-				{{end}}
-				</ul>
-			</li>
-			{{end}}
-			{{if .Badges}}
-			<li>
-				<ul class="user-badges">
-				{{range .Badges}}
-					<li>
-						<img width="64" height="64" src="{{.ImageURL}}" alt="{{.Description}}" data-tooltip-content="{{.Description}}">
-					</li>
-				{{end}}
-				</ul>
-			</li>
-			{{end}}
 		</ul>
 	</div>
 </div>
-
-{{template "shared/user/block_user_dialog" .}}

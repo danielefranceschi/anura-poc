@@ -39,7 +39,6 @@ const (
 func Profile(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("settings.profile")
 	ctx.Data["PageIsSettingsProfile"] = true
-	ctx.Data["AllowedUserVisibilityModes"] = setting.Service.AllowedUserVisibilityModesSlice.ToVisibleTypeSlice()
 	ctx.Data["DisableGravatar"] = setting.Config().Picture.DisableGravatar.Value(ctx)
 
 	ctx.Data["UserDisabledFeatures"] = user_model.DisabledFeaturesWithLoginType(ctx.Doer)
@@ -51,7 +50,6 @@ func Profile(ctx *context.Context) {
 func ProfilePost(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("settings")
 	ctx.Data["PageIsSettingsProfile"] = true
-	ctx.Data["AllowedUserVisibilityModes"] = setting.Service.AllowedUserVisibilityModesSlice.ToVisibleTypeSlice()
 	ctx.Data["DisableGravatar"] = setting.Config().Picture.DisableGravatar.Value(ctx)
 	ctx.Data["UserDisabledFeatures"] = user_model.DisabledFeaturesWithLoginType(ctx.Doer)
 
@@ -85,13 +83,11 @@ func ProfilePost(ctx *context.Context) {
 	}
 
 	opts := &user_service.UpdateOptions{
-		FullName:            optional.Some(form.FullName),
-		KeepEmailPrivate:    optional.Some(form.KeepEmailPrivate),
-		Description:         optional.Some(form.Description),
-		Website:             optional.Some(form.Website),
-		Location:            optional.Some(form.Location),
-		Visibility:          optional.Some(form.Visibility),
-		KeepActivityPrivate: optional.Some(form.KeepActivityPrivate),
+		FullName:         optional.Some(form.FullName),
+		KeepEmailPrivate: optional.Some(form.KeepEmailPrivate),
+		Description:      optional.Some(form.Description),
+		Website:          optional.Some(form.Website),
+		Location:         optional.Some(form.Location),
 	}
 	if err := user_service.UpdateUser(ctx, ctx.Doer, opts); err != nil {
 		ctx.ServerError("UpdateUser", err)

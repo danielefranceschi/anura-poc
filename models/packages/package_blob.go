@@ -9,7 +9,6 @@ import (
 
 	"code.gitea.io/gitea/models/db"
 	user_model "code.gitea.io/gitea/models/user"
-	"code.gitea.io/gitea/modules/structs"
 	"code.gitea.io/gitea/modules/timeutil"
 	"code.gitea.io/gitea/modules/util"
 
@@ -119,9 +118,7 @@ func IsBlobAccessibleForUser(ctx context.Context, blobID int64, user *user_model
 
 	cond := builder.Eq{"package_blob.id": blobID}.And(
 		// owner = user
-		builder.Eq{"`user`.id": user.ID}.
-			// user can see owner
-			Or(builder.Eq{"`user`.visibility": structs.VisibleTypePublic}.Or(builder.Eq{"`user`.visibility": structs.VisibleTypeLimited})),
+		builder.Eq{"`user`.id": user.ID},
 	)
 
 	return db.GetEngine(ctx).

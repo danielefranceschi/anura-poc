@@ -61,10 +61,6 @@ var microcmdUserCreate = &cli.Command{
 			Name:  "access-token",
 			Usage: "Generate access token for the user",
 		},
-		&cli.BoolFlag{
-			Name:  "restricted",
-			Usage: "Make a restricted user account",
-		},
 	},
 }
 
@@ -135,27 +131,16 @@ func runCreateUser(c *cli.Context) error {
 		}
 	}
 
-	restricted := optional.None[bool]()
-
-	if c.IsSet("restricted") {
-		restricted = optional.Some(c.Bool("restricted"))
-	}
-
-	// default user visibility in app.ini
-	visibility := setting.Service.DefaultUserVisibilityMode
-
 	u := &user_model.User{
 		Name:               username,
 		Email:              c.String("email"),
 		Passwd:             password,
 		IsAdmin:            isAdmin,
 		MustChangePassword: mustChangePassword,
-		Visibility:         visibility,
 	}
 
 	overwriteDefault := &user_model.CreateUserOverwriteOptions{
-		IsActive:     optional.Some(true),
-		IsRestricted: restricted,
+		IsActive: optional.Some(true),
 	}
 
 	if err := user_model.CreateUser(ctx, u, &user_model.Meta{}, overwriteDefault); err != nil {

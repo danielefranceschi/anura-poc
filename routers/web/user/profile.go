@@ -5,10 +5,8 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 
-	user_model "code.gitea.io/gitea/models/user"
 	"code.gitea.io/gitea/modules/base"
 	shared_user "code.gitea.io/gitea/routers/web/shared/user"
 	"code.gitea.io/gitea/services/context"
@@ -24,12 +22,6 @@ func OwnerProfile(ctx *context.Context) {
 }
 
 func userProfile(ctx *context.Context) {
-	// check view permissions
-	if !user_model.IsUserVisibleToViewer(ctx, ctx.ContextUser, ctx.Doer) {
-		ctx.NotFound("user", fmt.Errorf("%s", ctx.ContextUser.Name))
-		return
-	}
-
 	ctx.Data["Title"] = ctx.ContextUser.DisplayName()
 	ctx.Data["PageIsUserProfile"] = true
 

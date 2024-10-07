@@ -1031,9 +1031,8 @@ func SignInOAuthCallback(ctx *context.Context) {
 
 			source := authSource.Cfg.(*oauth2.Source)
 
-			isAdmin, isRestricted := getUserAdminAndRestrictedFromGroupClaims(source, &gothUser)
+			isAdmin := getUserAdminAndRestrictedFromGroupClaims(source, &gothUser)
 			u.IsAdmin = isAdmin.ValueOrDefault(false)
-			u.IsRestricted = isRestricted.ValueOrDefault(false)
 
 			if !createAndHandleCreatedUser(ctx, base.TplName(""), nil, u, overwriteDefault, &gothUser, setting.OAuth2Client.AccountLinking != setting.OAuth2AccountLinkingDisabled) {
 				// error already handled
@@ -1097,17 +1096,14 @@ func getClaimedGroups(source *oauth2.Source, gothUser *goth.User) container.Set[
 	return claimValueToStringSet(groupClaims)
 }
 
-func getUserAdminAndRestrictedFromGroupClaims(source *oauth2.Source, gothUser *goth.User) (isAdmin, isRestricted optional.Option[bool]) {
+func getUserAdminAndRestrictedFromGroupClaims(source *oauth2.Source, gothUser *goth.User) (isAdmin optional.Option[bool]) {
 	groups := getClaimedGroups(source, gothUser)
 
 	if source.AdminGroup != "" {
 		isAdmin = optional.Some(groups.Contains(source.AdminGroup))
 	}
-	if source.RestrictedGroup != "" {
-		isRestricted = optional.Some(groups.Contains(source.RestrictedGroup))
-	}
 
-	return isAdmin, isRestricted
+	return isAdmin
 }
 
 func showLinkingLogin(ctx *context.Context, gothUser goth.User) {
@@ -1168,7 +1164,7 @@ func handleOAuth2SignIn(ctx *context.Context, source *auth.Source, u *user_model
 	}
 
 	// Update GroupClaims
-	opts.IsAdmin, opts.IsRestricted = getUserAdminAndRestrictedFromGroupClaims(oauth2Source, &gothUser)
+	opts.IsAdmin = getUserAdminAndRestrictedFromGroupClaims(oauth2Source, &gothUser)
 
 	if oauth2Source.GroupTeamMap != "" || oauth2Source.GroupTeamMapRemoval {
 		if err := source_service.SyncGroupsToTeams(ctx, u, groups, groupTeamMapping, oauth2Source.GroupTeamMapRemoval); err != nil {
@@ -1219,7 +1215,7 @@ func handleOAuth2SignIn(ctx *context.Context, source *auth.Source, u *user_model
 		return
 	}
 
-	if opts.IsActive.Has() || opts.IsAdmin.Has() || opts.IsRestricted.Has() {
+	if opts.IsActive.Has() || opts.IsAdmin.Has() {
 		if err := user_service.UpdateUser(ctx, u, opts); err != nil {
 			ctx.ServerError("UpdateUser", err)
 			return

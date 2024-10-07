@@ -22,7 +22,6 @@ func prepareContextForCommonProfile(ctx *context.Context) {
 func PrepareContextForProfileBigAvatar(ctx *context.Context) {
 	prepareContextForCommonProfile(ctx)
 
-	ctx.Data["IsFollowing"] = ctx.Doer != nil && user_model.IsFollowing(ctx, ctx.Doer.ID, ctx.ContextUser.ID)
 	ctx.Data["ShowUserEmail"] = setting.UI.ShowUserEmail && ctx.ContextUser.Email != "" && ctx.IsSigned && !ctx.ContextUser.KeepEmailPrivate
 	if setting.Service.UserLocationMapURL != "" {
 		ctx.Data["ContextUserLocationMapURL"] = setting.Service.UserLocationMapURL + url.QueryEscape(ctx.ContextUser.Location)
@@ -34,13 +33,6 @@ func PrepareContextForProfileBigAvatar(ctx *context.Context) {
 		return
 	}
 	ctx.Data["OpenIDs"] = openIDs
-
-	badges, _, err := user_model.GetUserBadges(ctx, ctx.ContextUser)
-	if err != nil {
-		ctx.ServerError("GetUserBadges", err)
-		return
-	}
-	ctx.Data["Badges"] = badges
 }
 
 func LoadHeaderCount(ctx *context.Context) error {

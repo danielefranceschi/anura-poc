@@ -162,7 +162,6 @@ func parseOAuth2Config(c *cli.Context) *oauth2.Source {
 		RequiredClaimValue:            c.String("required-claim-value"),
 		GroupClaimName:                c.String("group-claim-name"),
 		AdminGroup:                    c.String("admin-group"),
-		RestrictedGroup:               c.String("restricted-group"),
 		GroupTeamMap:                  c.String("group-team-map"),
 		GroupTeamMapRemoval:           c.Bool("group-team-map-removal"),
 	}
@@ -251,9 +250,6 @@ func runUpdateOauth(c *cli.Context) error {
 	}
 	if c.IsSet("admin-group") {
 		oAuth2Config.AdminGroup = c.String("admin-group")
-	}
-	if c.IsSet("restricted-group") {
-		oAuth2Config.RestrictedGroup = c.String("restricted-group")
 	}
 	if c.IsSet("group-team-map") {
 		oAuth2Config.GroupTeamMap = c.String("group-team-map")

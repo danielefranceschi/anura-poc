@@ -7,7 +7,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	auth_model "code.gitea.io/gitea/models/auth"
@@ -23,14 +22,12 @@ import (
 )
 
 type ldapUser struct {
-	UserName     string
-	Password     string
-	FullName     string
-	Email        string
-	OtherEmails  []string
-	IsAdmin      bool
-	IsRestricted bool
-	SSHKeys      []string
+	UserName    string
+	Password    string
+	FullName    string
+	Email       string
+	OtherEmails []string
+	IsAdmin     bool
 }
 
 var gitLDAPUsers = []ldapUser{
@@ -47,12 +44,7 @@ var gitLDAPUsers = []ldapUser{
 		Password: "hermes",
 		FullName: "Conrad Hermes",
 		Email:    "hermes@planetexpress.com",
-		SSHKeys: []string{
-			"SHA256:qLY06smKfHoW/92yXySpnxFR10QFrLdRjf/GNPvwcW8",
-			"SHA256:QlVTuM5OssDatqidn2ffY+Lc4YA5Fs78U+0KOHI51jQ",
-			"SHA256:DXdeUKYOJCSSmClZuwrb60hUq7367j4fA+udNC3FdRI",
-		},
-		IsAdmin: true,
+		IsAdmin:  true,
 	},
 	{
 		UserName: "fry",
@@ -61,11 +53,10 @@ var gitLDAPUsers = []ldapUser{
 		Email:    "fry@planetexpress.com",
 	},
 	{
-		UserName:     "leela",
-		Password:     "leela",
-		FullName:     "Leela Turanga",
-		Email:        "leela@planetexpress.com",
-		IsRestricted: true,
+		UserName: "leela",
+		Password: "leela",
+		FullName: "Leela Turanga",
+		Email:    "leela@planetexpress.com",
 	},
 	{
 		UserName: "bender",
@@ -118,31 +109,29 @@ func buildAuthSourceLDAPPayload(csrf, sshKeyAttribute, groupFilter, groupTeamMap
 	}
 
 	return map[string]string{
-		"_csrf":                    csrf,
-		"type":                     "2",
-		"name":                     "ldap",
-		"host":                     getLDAPServerHost(),
-		"port":                     getLDAPServerPort(),
-		"bind_dn":                  "uid=gitea,ou=service,dc=planetexpress,dc=com",
-		"bind_password":            "password",
-		"user_base":                "ou=people,dc=planetexpress,dc=com",
-		"filter":                   userFilter,
-		"admin_filter":             "(memberOf=cn=admin_staff,ou=people,dc=planetexpress,dc=com)",
-		"restricted_filter":        "(uid=leela)",
-		"attribute_username":       "uid",
-		"attribute_name":           "givenName",
-		"attribute_surname":        "sn",
-		"attribute_mail":           "mail",
-		"attribute_ssh_public_key": sshKeyAttribute,
-		"is_sync_enabled":          "on",
-		"is_active":                "on",
-		"groups_enabled":           "on",
-		"group_dn":                 "ou=people,dc=planetexpress,dc=com",
-		"group_member_uid":         "member",
-		"group_filter":             groupFilter,
-		"group_team_map":           groupTeamMap,
-		"group_team_map_removal":   groupTeamMapRemoval,
-		"user_uid":                 "DN",
+		"_csrf":                  csrf,
+		"type":                   "2",
+		"name":                   "ldap",
+		"host":                   getLDAPServerHost(),
+		"port":                   getLDAPServerPort(),
+		"bind_dn":                "uid=gitea,ou=service,dc=planetexpress,dc=com",
+		"bind_password":          "password",
+		"user_base":              "ou=people,dc=planetexpress,dc=com",
+		"filter":                 userFilter,
+		"admin_filter":           "(memberOf=cn=admin_staff,ou=people,dc=planetexpress,dc=com)",
+		"attribute_username":     "uid",
+		"attribute_name":         "givenName",
+		"attribute_surname":      "sn",
+		"attribute_mail":         "mail",
+		"is_sync_enabled":        "on",
+		"is_active":              "on",
+		"groups_enabled":         "on",
+		"group_dn":               "ou=people,dc=planetexpress,dc=com",
+		"group_member_uid":       "member",
+		"group_filter":           groupFilter,
+		"group_team_map":         groupTeamMap,
+		"group_team_map_removal": groupTeamMapRemoval,
+		"user_uid":               "DN",
 	}
 }
 
@@ -232,7 +221,6 @@ func TestLDAPUserSync(t *testing.T) {
 		assert.Equal(t, gitLDAPUser.UserName, dbUser.Name)
 		assert.Equal(t, gitLDAPUser.Email, dbUser.Email)
 		assert.Equal(t, gitLDAPUser.IsAdmin, dbUser.IsAdmin)
-		assert.Equal(t, gitLDAPUser.IsRestricted, dbUser.IsRestricted)
 	}
 
 	// Check if no users exist
@@ -362,39 +350,6 @@ func TestLDAPUserSigninFailed(t *testing.T) {
 
 	u := otherLDAPUsers[0]
 	testLoginFailed(t, u.UserName, u.Password, translation.NewLocale("en-US").TrString("form.username_password_incorrect"))
-}
-
-func TestLDAPUserSSHKeySync(t *testing.T) {
-	if skipLDAPTests() {
-		t.Skip()
-		return
-	}
-	defer tests.PrepareTestEnv(t)()
-	addAuthSourceLDAP(t, "sshPublicKey", "")
-
-	auth.SyncExternalUsers(context.Background(), true)
-
-	// Check if users has SSH keys synced
-	for _, u := range gitLDAPUsers {
-		if len(u.SSHKeys) == 0 {
-			continue
-		}
-		session := loginUserWithPassword(t, u.UserName, u.Password)
-
-		req := NewRequest(t, "GET", "/user/settings/keys")
-		resp := session.MakeRequest(t, req, http.StatusOK)
-
-		htmlDoc := NewHTMLParser(t, resp.Body)
-
-		divs := htmlDoc.doc.Find("#keys-ssh .flex-item .flex-item-body:not(:last-child)")
-
-		syncedKeys := make([]string, divs.Length())
-		for i := 0; i < divs.Length(); i++ {
-			syncedKeys[i] = strings.TrimSpace(divs.Eq(i).Text())
-		}
-
-		assert.ElementsMatch(t, u.SSHKeys, syncedKeys, "Unequal number of keys synchronized for user: %s", u.UserName)
-	}
 }
 
 // func TestLDAPGroupTeamSyncAddMember(t *testing.T) {

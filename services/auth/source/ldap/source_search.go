@@ -25,7 +25,6 @@ type SearchResult struct {
 	Mail         string   // E-mail address
 	SSHPublicKey []string // SSH Public Key
 	IsAdmin      bool     // if user is administrator
-	IsRestricted bool     // if user is restricted
 	LowerName    string   // LowerName
 	Avatar       []byte
 	Groups       container.Set[string]
@@ -184,7 +183,7 @@ func checkRestricted(l *ldap.Conn, ls *Source, userDN string) bool {
 	sr, err := l.Search(search)
 
 	if err != nil {
-		log.Error("LDAP Restrictred Search with filter %s for %s failed unexpectedly! (%v)", ls.RestrictedFilter, userDN, err)
+		log.Error("LDAP Restricted Search with filter %s for %s failed unexpectedly! (%v)", ls.RestrictedFilter, userDN, err)
 	} else if len(sr.Entries) < 1 {
 		log.Trace("LDAP Restricted Search found no matching entries.")
 	} else {
@@ -370,11 +369,6 @@ func (source *Source) SearchEntry(name, passwd string, directBind bool) *SearchR
 
 	isAdmin := checkAdmin(l, source, userDN)
 
-	var isRestricted bool
-	if !isAdmin {
-		isRestricted = checkRestricted(l, source, userDN)
-	}
-
 	if isAtributeAvatarSet {
 		Avatar = sr.Entries[0].GetRawAttributeValue(source.AttributeAvatar)
 	}
@@ -406,7 +400,6 @@ func (source *Source) SearchEntry(name, passwd string, directBind bool) *SearchR
 		Mail:         mail,
 		SSHPublicKey: sshPublicKey,
 		IsAdmin:      isAdmin,
-		IsRestricted: isRestricted,
 		Avatar:       Avatar,
 		Groups:       usersLdapGroups,
 	}
@@ -493,10 +486,6 @@ func (source *Source) SearchEntries() ([]*SearchResult, error) {
 			Mail:     v.GetAttributeValue(source.AttributeMail),
 			IsAdmin:  checkAdmin(l, source, v.DN),
 			Groups:   usersLdapGroups,
-		}
-
-		if !user.IsAdmin {
-			user.IsRestricted = checkRestricted(l, source, v.DN)
 		}
 
 		if isAttributeSSHPublicKeySet {

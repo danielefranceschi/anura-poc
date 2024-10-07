@@ -52,11 +52,7 @@ func (source *Source) Authenticate(ctx context.Context, user *user_model.User, u
 				// Change existing admin flag only if AdminFilter option is set
 				opts.IsAdmin = optional.Some(sr.IsAdmin)
 			}
-			if !sr.IsAdmin && len(source.RestrictedFilter) > 0 && user.IsRestricted != sr.IsRestricted {
-				// Change existing restricted flag only if RestrictedFilter option is set
-				opts.IsRestricted = optional.Some(sr.IsRestricted)
-			}
-			if opts.IsAdmin.Has() || opts.IsRestricted.Has() {
+			if opts.IsAdmin.Has() {
 				if err := user_service.UpdateUser(ctx, user, opts); err != nil {
 					return nil, err
 				}
@@ -76,8 +72,7 @@ func (source *Source) Authenticate(ctx context.Context, user *user_model.User, u
 			IsAdmin:     sr.IsAdmin,
 		}
 		overwriteDefault := &user_model.CreateUserOverwriteOptions{
-			IsRestricted: optional.Some(sr.IsRestricted),
-			IsActive:     optional.Some(true),
+			IsActive: optional.Some(true),
 		}
 
 		err := user_model.CreateUser(ctx, user, &user_model.Meta{}, overwriteDefault)

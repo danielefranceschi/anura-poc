@@ -24,7 +24,6 @@ import (
 	user_model "code.gitea.io/gitea/models/user"
 	nuget_module "code.gitea.io/gitea/modules/packages/nuget"
 	"code.gitea.io/gitea/modules/setting"
-	"code.gitea.io/gitea/modules/structs"
 	"code.gitea.io/gitea/routers/api/packages/nuget"
 	packageService "code.gitea.io/gitea/services/packages"
 	"code.gitea.io/gitea/tests"
@@ -127,7 +126,7 @@ func TestPackageNuGet(t *testing.T) {
 		t.Run("v2", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()
 
-			privateUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{Visibility: structs.VisibleTypePrivate})
+			privateUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{})
 
 			cases := []struct {
 				Owner          string
@@ -174,7 +173,7 @@ func TestPackageNuGet(t *testing.T) {
 		t.Run("v3", func(t *testing.T) {
 			defer tests.PrintCurrentTest(t)()
 
-			privateUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{Visibility: structs.VisibleTypePrivate})
+			privateUser := unittest.AssertExistsAndLoadBean(t, &user_model.User{})
 
 			cases := []struct {
 				Owner          string

@@ -5,7 +5,6 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -77,16 +76,7 @@ func UsernameSubRoute(ctx *context.Context) {
 	reloadParam := func(suffix string) (success bool) {
 		ctx.SetPathParam("username", strings.TrimSuffix(username, suffix))
 		context.UserAssignmentWeb()(ctx)
-		if ctx.Written() {
-			return false
-		}
-
-		// check view permissions
-		if !user_model.IsUserVisibleToViewer(ctx, ctx.ContextUser, ctx.Doer) {
-			ctx.NotFound("user", fmt.Errorf("%s", ctx.ContextUser.Name))
-			return false
-		}
-		return true
+		return !ctx.Written()
 	}
 	switch {
 	case strings.HasSuffix(username, ".png"):

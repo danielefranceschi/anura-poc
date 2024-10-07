@@ -66,7 +66,6 @@
 						</th>
 						<th>{{ctx.Locale.Tr "email"}}</th>
 						<th>{{ctx.Locale.Tr "admin.users.activated"}}</th>
-						<th>{{ctx.Locale.Tr "admin.users.restricted"}}</th>
 						<th>{{ctx.Locale.Tr "admin.users.2fa"}}</th>
 						<th>{{ctx.Locale.Tr "admin.users.created"}}</th>
 						<th data-sortt-asc="lastlogin" data-sortt-desc="reverselastlogin">
@@ -94,7 +93,6 @@
 							</td>
 							<td class="gt-ellipsis tw-max-w-48">{{.Email}}</td>
 							<td>{{svg (Iif .IsActive "octicon-check" "octicon-x")}}</td>
-							<td>{{svg (Iif .IsRestricted "octicon-check" "octicon-x")}}</td>
 							<td>{{svg (Iif (index $.UsersTwoFaStatus .ID) "octicon-check" "octicon-x")}}</td>
 							<td>{{DateTime "short" .CreatedUnix}}</td>
 							{{if .LastLoginUnix}}

@@ -75,7 +75,6 @@ func Users(ctx *context.Context) {
 		SearchByEmail:      true,
 		IsActive:           util.OptionalBoolParse(statusFilterMap["is_active"]),
 		IsAdmin:            util.OptionalBoolParse(statusFilterMap["is_admin"]),
-		IsRestricted:       util.OptionalBoolParse(statusFilterMap["is_restricted"]),
 		IsTwoFactorEnabled: util.OptionalBoolParse(statusFilterMap["is_2fa_enabled"]),
 		IsProhibitLogin:    util.OptionalBoolParse(statusFilterMap["is_prohibit_login"]),
 		IncludeReserved:    true, // administrator needs to list all accounts include reserved, bot, remote ones
@@ -87,8 +86,6 @@ func Users(ctx *context.Context) {
 func NewUser(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("admin.users.new_account")
 	ctx.Data["PageIsAdminUsers"] = true
-	ctx.Data["DefaultUserVisibilityMode"] = setting.Service.DefaultUserVisibilityMode
-	ctx.Data["AllowedUserVisibilityModes"] = setting.Service.AllowedUserVisibilityModesSlice.ToVisibleTypeSlice()
 
 	ctx.Data["login_type"] = "0-0"
 
@@ -109,8 +106,6 @@ func NewUserPost(ctx *context.Context) {
 	form := web.GetForm(ctx).(*forms.AdminCreateUserForm)
 	ctx.Data["Title"] = ctx.Tr("admin.users.new_account")
 	ctx.Data["PageIsAdminUsers"] = true
-	ctx.Data["DefaultUserVisibilityMode"] = setting.Service.DefaultUserVisibilityMode
-	ctx.Data["AllowedUserVisibilityModes"] = setting.Service.AllowedUserVisibilityModesSlice.ToVisibleTypeSlice()
 
 	sources, err := db.Find[auth.Source](ctx, auth.FindSourcesOptions{
 		IsActive: optional.Some(true),
@@ -134,8 +129,7 @@ func NewUserPost(ctx *context.Context) {
 	}
 
 	overwriteDefault := &user_model.CreateUserOverwriteOptions{
-		IsActive:   optional.Some(true),
-		Visibility: &form.Visibility,
+		IsActive: optional.Some(true),
 	}
 
 	if len(form.LoginType) > 0 {
@@ -254,7 +248,6 @@ func prepareUserInfo(ctx *context.Context) *user_model.User {
 func ViewUser(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("admin.users.details")
 	ctx.Data["PageIsAdminUsers"] = true
-	ctx.Data["AllowedUserVisibilityModes"] = setting.Service.AllowedUserVisibilityModesSlice.ToVisibleTypeSlice()
 
 	u := prepareUserInfo(ctx)
 	if ctx.Written() {
@@ -277,7 +270,6 @@ func editUserCommon(ctx *context.Context) {
 	ctx.Data["PageIsAdminUsers"] = true
 	ctx.Data["DisableRegularOrgCreation"] = setting.Admin.DisableRegularOrgCreation
 	ctx.Data["DisableMigrations"] = setting.Repository.DisableMigrations
-	ctx.Data["AllowedUserVisibilityModes"] = setting.Service.AllowedUserVisibilityModesSlice.ToVisibleTypeSlice()
 	ctx.Data["DisableGravatar"] = setting.Config().Picture.DisableGravatar.Value(ctx)
 }
 
@@ -390,14 +382,12 @@ func EditUserPost(ctx *context.Context) {
 	}
 
 	opts := &user_service.UpdateOptions{
-		FullName:     optional.Some(form.FullName),
-		Website:      optional.Some(form.Website),
-		Location:     optional.Some(form.Location),
-		IsActive:     optional.Some(form.Active),
-		IsAdmin:      optional.Some(form.Admin),
-		IsRestricted: optional.Some(form.Restricted),
-		Visibility:   optional.Some(form.Visibility),
-		Language:     optional.Some(form.Language),
+		FullName: optional.Some(form.FullName),
+		Website:  optional.Some(form.Website),
+		Location: optional.Some(form.Location),
+		IsActive: optional.Some(form.Active),
+		IsAdmin:  optional.Some(form.Admin),
+		Language: optional.Some(form.Language),
 	}
 
 	if err := user_service.UpdateUser(ctx, u, opts); err != nil {

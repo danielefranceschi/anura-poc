@@ -78,11 +78,6 @@ func WebfingerQuery(ctx *context.Context) {
 		return
 	}
 
-	if !user_model.IsUserVisibleToViewer(ctx, u, ctx.Doer) {
-		ctx.Error(http.StatusNotFound)
-		return
-	}
-
 	aliases := []string{
 		u.HTMLURL(),
 		appURL.String() + "api/v1/activitypub/user-id/" + fmt.Sprint(u.ID),

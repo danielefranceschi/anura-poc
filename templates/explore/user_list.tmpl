@@ -7,9 +7,6 @@
 			<div class="flex-item-main">
 				<div class="flex-item-title">
 					{{template "shared/user/name" .}}
-					{{if .Visibility.IsPrivate}}
-						<span class="ui basic tiny label">{{ctx.Locale.Tr "repo.desc.private"}}</span>
-					{{end}}
 				</div>
 				<div class="flex-item-body">
 					{{if .Location}}

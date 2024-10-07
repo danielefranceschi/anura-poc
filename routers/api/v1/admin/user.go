@@ -112,13 +112,7 @@ func CreateUser(ctx *context.APIContext) {
 	}
 
 	overwriteDefault := &user_model.CreateUserOverwriteOptions{
-		IsActive:     optional.Some(true),
-		IsRestricted: optional.FromPtr(form.Restricted),
-	}
-
-	if form.Visibility != "" {
-		visibility := api.VisibilityModes[form.Visibility]
-		overwriteDefault.Visibility = &visibility
+		IsActive: optional.Some(true),
 	}
 
 	// Update the user creation timestamp. This can only be done after the user
@@ -224,14 +218,12 @@ func EditUser(ctx *context.APIContext) {
 	}
 
 	opts := &user_service.UpdateOptions{
-		FullName:     optional.FromPtr(form.FullName),
-		Website:      optional.FromPtr(form.Website),
-		Location:     optional.FromPtr(form.Location),
-		Description:  optional.FromPtr(form.Description),
-		IsActive:     optional.FromPtr(form.Active),
-		IsAdmin:      optional.FromPtr(form.Admin),
-		Visibility:   optional.FromNonDefault(api.VisibilityModes[form.Visibility]),
-		IsRestricted: optional.FromPtr(form.Restricted),
+		FullName:    optional.FromPtr(form.FullName),
+		Website:     optional.FromPtr(form.Website),
+		Location:    optional.FromPtr(form.Location),
+		Description: optional.FromPtr(form.Description),
+		IsActive:    optional.FromPtr(form.Active),
+		IsAdmin:     optional.FromPtr(form.Admin),
 	}
 
 	if err := user_service.UpdateUser(ctx, ctx.ContextUser, opts); err != nil {

@@ -57,9 +57,6 @@
 							<td>{{.Version.ID}}</td>
 							<td>
 								<a href="{{.Owner.HomeLink}}">{{.Owner.Name}}</a>
-								{{if .Owner.Visibility.IsPrivate}}
-									<span class="text gold">{{svg "octicon-lock"}}</span>
-								{{end}}
 							</td>
 							<td>{{.Package.Type.Name}}</td>
 							<td class="gt-ellipsis tw-max-w-48">{{.Package.Name}}</td>

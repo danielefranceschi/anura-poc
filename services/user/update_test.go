@@ -11,7 +11,6 @@ import (
 	user_model "code.gitea.io/gitea/models/user"
 	password_module "code.gitea.io/gitea/modules/auth/password"
 	"code.gitea.io/gitea/modules/optional"
-	"code.gitea.io/gitea/modules/structs"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -28,20 +27,16 @@ func TestUpdateUser(t *testing.T) {
 	user := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 28})
 
 	opts := &UpdateOptions{
-		KeepEmailPrivate:    optional.Some(false),
-		FullName:            optional.Some("Changed Name"),
-		Website:             optional.Some("https://gitea.com/"),
-		Location:            optional.Some("location"),
-		Description:         optional.Some("description"),
-		IsRestricted:        optional.Some(true),
-		IsActive:            optional.Some(false),
-		IsAdmin:             optional.Some(true),
-		Visibility:          optional.Some(structs.VisibleTypePrivate),
-		KeepActivityPrivate: optional.Some(true),
-		Language:            optional.Some("lang"),
-		Theme:               optional.Some("theme"),
-		DiffViewStyle:       optional.Some("split"),
-		SetLastLogin:        true,
+		KeepEmailPrivate: optional.Some(false),
+		FullName:         optional.Some("Changed Name"),
+		Website:          optional.Some("https://gitea.com/"),
+		Location:         optional.Some("location"),
+		Description:      optional.Some("description"),
+		IsActive:         optional.Some(false),
+		IsAdmin:          optional.Some(true),
+		Language:         optional.Some("lang"),
+		Theme:            optional.Some("theme"),
+		SetLastLogin:     true,
 	}
 	assert.NoError(t, UpdateUser(db.DefaultContext, user, opts))
 
@@ -50,14 +45,10 @@ func TestUpdateUser(t *testing.T) {
 	assert.Equal(t, opts.Website.Value(), user.Website)
 	assert.Equal(t, opts.Location.Value(), user.Location)
 	assert.Equal(t, opts.Description.Value(), user.Description)
-	assert.Equal(t, opts.IsRestricted.Value(), user.IsRestricted)
 	assert.Equal(t, opts.IsActive.Value(), user.IsActive)
 	assert.Equal(t, opts.IsAdmin.Value(), user.IsAdmin)
-	assert.Equal(t, opts.Visibility.Value(), user.Visibility)
-	assert.Equal(t, opts.KeepActivityPrivate.Value(), user.KeepActivityPrivate)
 	assert.Equal(t, opts.Language.Value(), user.Language)
 	assert.Equal(t, opts.Theme.Value(), user.Theme)
-	assert.Equal(t, opts.DiffViewStyle.Value(), user.DiffViewStyle)
 
 	user = unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 28})
 	assert.Equal(t, opts.KeepEmailPrivate.Value(), user.KeepEmailPrivate)
@@ -65,14 +56,10 @@ func TestUpdateUser(t *testing.T) {
 	assert.Equal(t, opts.Website.Value(), user.Website)
 	assert.Equal(t, opts.Location.Value(), user.Location)
 	assert.Equal(t, opts.Description.Value(), user.Description)
-	assert.Equal(t, opts.IsRestricted.Value(), user.IsRestricted)
 	assert.Equal(t, opts.IsActive.Value(), user.IsActive)
 	assert.Equal(t, opts.IsAdmin.Value(), user.IsAdmin)
-	assert.Equal(t, opts.Visibility.Value(), user.Visibility)
-	assert.Equal(t, opts.KeepActivityPrivate.Value(), user.KeepActivityPrivate)
 	assert.Equal(t, opts.Language.Value(), user.Language)
 	assert.Equal(t, opts.Theme.Value(), user.Theme)
-	assert.Equal(t, opts.DiffViewStyle.Value(), user.DiffViewStyle)
 }
 
 func TestUpdateAuth(t *testing.T) {

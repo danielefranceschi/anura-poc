@@ -8,11 +8,6 @@
 			<div class="ui twelve wide column tw-mb-4">
 				{{template "user/overview/header" .}}
 				{{if eq .TabName "activity"}}
-					{{if .ContextUser.KeepActivityPrivate}}
-						<div class="ui info message">
-							<p>{{ctx.Locale.Tr "user.disabled_public_activity"}}</p>
-						</div>
-					{{end}}
 					{{template "user/heatmap" .}}
 				{{else if eq .TabName "stars"}}
 					<div class="stars">

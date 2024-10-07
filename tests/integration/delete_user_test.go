@@ -15,8 +15,6 @@ import (
 
 func assertUserDeleted(t *testing.T, userID int64) {
 	unittest.AssertNotExistsBean(t, &user_model.User{ID: userID})
-	unittest.AssertNotExistsBean(t, &user_model.Follow{UserID: userID})
-	unittest.AssertNotExistsBean(t, &user_model.Follow{FollowID: userID})
 }
 
 func TestUserDeleteAccount(t *testing.T) {

@@ -33,7 +33,6 @@ func deleteUser(ctx context.Context, u *user_model.User, purge bool) (err error)
 		&user_model.EmailAddress{UID: u.ID},
 		&user_model.UserOpenID{UID: u.ID},
 		&user_model.Setting{UserID: u.ID},
-		&user_model.UserBadge{UserID: u.ID},
 	); err != nil {
 		return fmt.Errorf("deleteBeans: %w", err)
 	}

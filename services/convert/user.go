@@ -55,17 +55,10 @@ func toUser(ctx context.Context, user *user_model.User, signed, authed bool) *ap
 		AvatarURL:   user.AvatarLink(ctx),
 		HTMLURL:     user.HTMLURL(),
 		Created:     user.CreatedUnix.AsTime(),
-		Restricted:  user.IsRestricted,
 		Location:    user.Location,
 		Website:     user.Website,
 		Description: user.Description,
-		// counter's
-		Followers:    user.NumFollowers,
-		Following:    user.NumFollowing,
-		StarredRepos: user.NumStars,
 	}
-
-	result.Visibility = user.Visibility.String()
 
 	// hide primary email if API caller is anonymous or user keep email private
 	if signed && (!user.KeepEmailPrivate || authed) {
@@ -88,14 +81,12 @@ func toUser(ctx context.Context, user *user_model.User, signed, authed bool) *ap
 // User2UserSettings return UserSettings based on a user
 func User2UserSettings(user *user_model.User) api.UserSettings {
 	return api.UserSettings{
-		FullName:      user.FullName,
-		Website:       user.Website,
-		Location:      user.Location,
-		Language:      user.Language,
-		Description:   user.Description,
-		Theme:         user.Theme,
-		HideEmail:     user.KeepEmailPrivate,
-		HideActivity:  user.KeepActivityPrivate,
-		DiffViewStyle: user.DiffViewStyle,
+		FullName:    user.FullName,
+		Website:     user.Website,
+		Location:    user.Location,
+		Language:    user.Language,
+		Description: user.Description,
+		Theme:       user.Theme,
+		HideEmail:   user.KeepEmailPrivate,
 	}
 }

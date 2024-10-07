@@ -347,24 +347,6 @@ func verifyAuthWithOptions(options *common.VerifyOptions) func(ctx *context.APIC
 	}
 }
 
-func individualPermsChecker(ctx *context.APIContext) {
-	// org permissions have been checked in context.OrgAssignment(), but individual permissions haven't been checked.
-	if ctx.ContextUser.IsIndividual() {
-		switch {
-		case ctx.ContextUser.Visibility == api.VisibleTypePrivate:
-			if ctx.Doer == nil || (ctx.ContextUser.ID != ctx.Doer.ID && !ctx.Doer.IsAdmin) {
-				ctx.NotFound("Visit Project", nil)
-				return
-			}
-		case ctx.ContextUser.Visibility == api.VisibleTypeLimited:
-			if ctx.Doer == nil {
-				ctx.NotFound("Visit Project", nil)
-				return
-			}
-		}
-	}
-}
-
 // check for and warn against deprecated authentication options
 func checkDeprecatedAuthMethods(ctx *context.APIContext) {
 	if ctx.FormString("token") != "" || ctx.FormString("access_token") != "" {
@@ -428,7 +410,7 @@ func Routes() *web.Router {
 					m.Combo("/{id}").Delete(reqToken(), user.DeleteAccessToken)
 				}, reqSelfOrAdmin(), reqBasicOrRevProxyAuth())
 
-			}, context.UserAssignmentAPI(), individualPermsChecker)
+			}, context.UserAssignmentAPI())
 		}, tokenRequiresScopes(auth_model.AccessTokenScopeCategoryUser))
 
 		// Users (requires user scope)

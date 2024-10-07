@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"code.gitea.io/gitea/modules/log"
-	"code.gitea.io/gitea/modules/structs"
 
 	"github.com/gobwas/glob"
 )
@@ -25,10 +24,6 @@ const (
 
 // Service settings
 var Service = struct {
-	DefaultUserVisibility                   string
-	DefaultUserVisibilityMode               structs.VisibleType
-	AllowedUserVisibilityModes              []string
-	AllowedUserVisibilityModesSlice         AllowedVisibility `ini:"-"`
 	ActiveCodeLives                         int
 	ResetPwdCodeLives                       int
 	EmailDomainAllowList                    []glob.Glob
@@ -62,7 +57,6 @@ var Service = struct {
 	McaptchaSitekey                         string
 	McaptchaURL                             string
 	DefaultKeepEmailPrivate                 bool
-	DefaultUserIsRestricted                 bool
 	EnableTimetracking                      bool
 	DefaultEnableTimetracking               bool
 	DefaultEnableDependencies               bool
@@ -84,30 +78,7 @@ var Service = struct {
 		RequireSigninView bool `ini:"REQUIRE_SIGNIN_VIEW"`
 		DisableUsersPage  bool `ini:"DISABLE_USERS_PAGE"`
 	} `ini:"service.explore"`
-}{
-	AllowedUserVisibilityModesSlice: []bool{true, true, true},
-}
-
-// AllowedVisibility store in a 3 item bool array what is allowed
-type AllowedVisibility []bool
-
-// IsAllowedVisibility check if a AllowedVisibility allow a specific VisibleType
-func (a AllowedVisibility) IsAllowedVisibility(t structs.VisibleType) bool {
-	if int(t) >= len(a) {
-		return false
-	}
-	return a[t]
-}
-
-// ToVisibleTypeSlice convert a AllowedVisibility into a VisibleType slice
-func (a AllowedVisibility) ToVisibleTypeSlice() (result []structs.VisibleType) {
-	for i, v := range a {
-		if v {
-			result = append(result, structs.VisibleType(i))
-		}
-	}
-	return result
-}
+}{}
 
 func CompileEmailGlobList(sec ConfigSection, keys ...string) (globs []glob.Glob) {
 	for _, key := range keys {
@@ -164,7 +135,6 @@ func loadServiceFrom(rootCfg ConfigProvider) {
 	Service.McaptchaSecret = sec.Key("MCAPTCHA_SECRET").MustString("")
 	Service.McaptchaSitekey = sec.Key("MCAPTCHA_SITEKEY").MustString("")
 	Service.DefaultKeepEmailPrivate = sec.Key("DEFAULT_KEEP_EMAIL_PRIVATE").MustBool()
-	Service.DefaultUserIsRestricted = sec.Key("DEFAULT_USER_IS_RESTRICTED").MustBool(false)
 	Service.EnableTimetracking = sec.Key("ENABLE_TIMETRACKING").MustBool(true)
 	if Service.EnableTimetracking {
 		Service.DefaultEnableTimetracking = sec.Key("DEFAULT_ENABLE_TIMETRACKING").MustBool(true)
@@ -174,33 +144,7 @@ func loadServiceFrom(rootCfg ConfigProvider) {
 	Service.DefaultAllowOnlyContributorsToTrackTime = sec.Key("DEFAULT_ALLOW_ONLY_CONTRIBUTORS_TO_TRACK_TIME").MustBool(true)
 	Service.NoReplyAddress = sec.Key("NO_REPLY_ADDRESS").MustString("noreply." + Domain)
 	Service.UserLocationMapURL = sec.Key("USER_LOCATION_MAP_URL").String()
-	modes := sec.Key("ALLOWED_USER_VISIBILITY_MODES").Strings(",")
-	if len(modes) != 0 {
-		Service.AllowedUserVisibilityModes = []string{}
-		Service.AllowedUserVisibilityModesSlice = []bool{false, false, false}
-		for _, sMode := range modes {
-			if tp, ok := structs.VisibilityModes[sMode]; ok { // remove unsupported modes
-				Service.AllowedUserVisibilityModes = append(Service.AllowedUserVisibilityModes, sMode)
-				Service.AllowedUserVisibilityModesSlice[tp] = true
-			} else {
-				log.Warn("ALLOWED_USER_VISIBILITY_MODES %s is unsupported", sMode)
-			}
-		}
-	}
 
-	if len(Service.AllowedUserVisibilityModes) == 0 {
-		Service.AllowedUserVisibilityModes = []string{"public", "limited", "private"}
-		Service.AllowedUserVisibilityModesSlice = []bool{true, true, true}
-	}
-
-	Service.DefaultUserVisibility = sec.Key("DEFAULT_USER_VISIBILITY").String()
-	if Service.DefaultUserVisibility == "" {
-		Service.DefaultUserVisibility = Service.AllowedUserVisibilityModes[0]
-	} else if !Service.AllowedUserVisibilityModesSlice[structs.VisibilityModes[Service.DefaultUserVisibility]] {
-		log.Warn("DEFAULT_USER_VISIBILITY %s is wrong or not in ALLOWED_USER_VISIBILITY_MODES, using first allowed", Service.DefaultUserVisibility)
-		Service.DefaultUserVisibility = Service.AllowedUserVisibilityModes[0]
-	}
-	Service.DefaultUserVisibilityMode = structs.VisibilityModes[Service.DefaultUserVisibility]
 	Service.UserDeleteWithCommentsMaxTime = sec.Key("USER_DELETE_WITH_COMMENTS_MAX_TIME").MustDuration(0)
 	sec.Key("VALID_SITE_URL_SCHEMES").MustString("http,https")
 	Service.ValidSiteURLSchemes = sec.Key("VALID_SITE_URL_SCHEMES").Strings(",")

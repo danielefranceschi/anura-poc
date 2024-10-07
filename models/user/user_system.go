@@ -5,8 +5,6 @@ package user
 
 import (
 	"strings"
-
-	"code.gitea.io/gitea/modules/structs"
 )
 
 const (
@@ -60,7 +58,6 @@ func NewActionsUser() *User {
 		KeepEmailPrivate: true,
 		LoginName:        ActionsUserName,
 		Type:             UserTypeIndividual,
-		Visibility:       structs.VisibleTypePublic,
 	}
 }
 

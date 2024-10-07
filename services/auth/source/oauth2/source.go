@@ -24,7 +24,6 @@ type Source struct {
 	AdminGroup          string
 	GroupTeamMap        string
 	GroupTeamMapRemoval bool
-	RestrictedGroup     string
 	SkipLocalTwoFA      bool `json:",omitempty"`
 
 	// reference to the authSource

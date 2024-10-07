@@ -109,8 +109,7 @@ func (source *Source) Sync(ctx context.Context, updateExisting bool) error {
 				IsAdmin:     su.IsAdmin,
 			}
 			overwriteDefault := &user_model.CreateUserOverwriteOptions{
-				IsRestricted: optional.Some(su.IsRestricted),
-				IsActive:     optional.Some(true),
+				IsActive: optional.Some(true),
 			}
 
 			err = user_model.CreateUser(ctx, usr, &user_model.Meta{}, overwriteDefault)
@@ -124,7 +123,6 @@ func (source *Source) Sync(ctx context.Context, updateExisting bool) error {
 		} else if updateExisting {
 			// Check if user data has changed
 			if (len(source.AdminFilter) > 0 && usr.IsAdmin != su.IsAdmin) ||
-				(len(source.RestrictedFilter) > 0 && usr.IsRestricted != su.IsRestricted) ||
 				!strings.EqualFold(usr.Email, su.Mail) ||
 				usr.FullName != fullName ||
 				!usr.IsActive {
@@ -136,10 +134,6 @@ func (source *Source) Sync(ctx context.Context, updateExisting bool) error {
 				}
 				if source.AdminFilter != "" {
 					opts.IsAdmin = optional.Some(su.IsAdmin)
-				}
-				// Change existing restricted flag only if RestrictedFilter option is set
-				if !su.IsAdmin && source.RestrictedFilter != "" {
-					opts.IsRestricted = optional.Some(su.IsRestricted)
 				}
 
 				if err := user_service.UpdateUser(ctx, usr, opts); err != nil {

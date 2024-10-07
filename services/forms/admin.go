@@ -6,7 +6,6 @@ package forms
 import (
 	"net/http"
 
-	"code.gitea.io/gitea/modules/structs"
 	"code.gitea.io/gitea/modules/web/middleware"
 	"code.gitea.io/gitea/services/context"
 
@@ -20,9 +19,7 @@ type AdminCreateUserForm struct {
 	UserName           string `binding:"Required;Username;MaxSize(40)"`
 	Email              string `binding:"Required;Email;MaxSize(254)"`
 	Password           string `binding:"MaxSize(255)"`
-	SendNotify         bool
 	MustChangePassword bool
-	Visibility         structs.VisibleType
 }
 
 // Validate validates form fields
@@ -33,25 +30,19 @@ func (f *AdminCreateUserForm) Validate(req *http.Request, errs binding.Errors) b
 
 // AdminEditUserForm form for admin to create user
 type AdminEditUserForm struct {
-	LoginType               string `binding:"Required"`
-	UserName                string `binding:"Username;MaxSize(40)"`
-	LoginName               string
-	FullName                string `binding:"MaxSize(100)"`
-	Email                   string `binding:"Required;Email;MaxSize(254)"`
-	Password                string `binding:"MaxSize(255)"`
-	Website                 string `binding:"ValidUrl;MaxSize(255)"`
-	Location                string `binding:"MaxSize(50)"`
-	Language                string `binding:"MaxSize(5)"`
-	MaxRepoCreation         int
-	Active                  bool
-	Admin                   bool
-	Restricted              bool
-	AllowGitHook            bool
-	AllowImportLocal        bool
-	AllowCreateOrganization bool
-	ProhibitLogin           bool
-	Reset2FA                bool `form:"reset_2fa"`
-	Visibility              structs.VisibleType
+	LoginType     string `binding:"Required"`
+	UserName      string `binding:"Username;MaxSize(40)"`
+	LoginName     string
+	FullName      string `binding:"MaxSize(100)"`
+	Email         string `binding:"Required;Email;MaxSize(254)"`
+	Password      string `binding:"MaxSize(255)"`
+	Website       string `binding:"ValidUrl;MaxSize(255)"`
+	Location      string `binding:"MaxSize(50)"`
+	Language      string `binding:"MaxSize(5)"`
+	Active        bool
+	Admin         bool
+	ProhibitLogin bool
+	Reset2FA      bool `form:"reset_2fa"`
 }
 
 // Validate validates form fields

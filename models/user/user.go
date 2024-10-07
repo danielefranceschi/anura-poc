@@ -28,7 +28,6 @@ import (
 	"code.gitea.io/gitea/modules/log"
 	"code.gitea.io/gitea/modules/optional"
 	"code.gitea.io/gitea/modules/setting"
-	"code.gitea.io/gitea/modules/structs"
 	"code.gitea.io/gitea/modules/timeutil"
 	"code.gitea.io/gitea/modules/util"
 	"code.gitea.io/gitea/modules/validation"
@@ -49,25 +48,11 @@ const (
 	// UserTypeUserReserved reserves a (non-existing) user, i.e. to prevent a spam user from re-registering after being deleted, or to reserve the name until the user is actually created later on
 	UserTypeUserReserved
 
-	// UserTypeOrganizationReserved reserves a (non-existing) organization, to be used in combination with UserTypeUserReserved
-	UserTypeOrganizationReserved
-
 	// UserTypeBot defines a bot user
 	UserTypeBot
 
 	// UserTypeRemoteUser defines a remote user for federated users
 	UserTypeRemoteUser
-)
-
-const (
-	// EmailNotificationsEnabled indicates that the user would like to receive all email notifications except your own
-	EmailNotificationsEnabled = "enabled"
-	// EmailNotificationsOnMention indicates that the user would like to be notified via email when mentioned.
-	EmailNotificationsOnMention = "onmention"
-	// EmailNotificationsDisabled indicates that the user would not like to be notified via email.
-	EmailNotificationsDisabled = "disabled"
-	// EmailNotificationsAndYourOwn indicates that the user would like to receive all email notifications and your own
-	EmailNotificationsAndYourOwn = "andyourown"
 )
 
 // User represents the object of individual and member of organization.
@@ -101,22 +86,11 @@ type User struct {
 	UpdatedUnix   timeutil.TimeStamp `xorm:"INDEX updated"`
 	LastLoginUnix timeutil.TimeStamp `xorm:"INDEX"`
 
-	// Remember visibility choice for convenience, true for private
-	LastRepoVisibility bool
-	// Maximum repository creation limit, -1 means use global default
-	MaxRepoCreation int `xorm:"NOT NULL DEFAULT -1"`
-
 	// IsActive true: primary email is activated, user can access Web UI and Git SSH.
 	// false: an inactive user can only log in Web UI for account operations (ex: activate the account by email), no other access.
 	IsActive bool `xorm:"INDEX"`
 	// the user is a Gitea admin, who can access all repositories and the admin pages.
 	IsAdmin bool
-	// true: the user is only allowed to see organizations/repositories that they has explicit rights to.
-	// (ex: in private Gitea instances user won't be allowed to see even organizations/repositories that are set as public)
-	IsRestricted bool `xorm:"NOT NULL DEFAULT false"`
-
-	AllowGitHook     bool
-	AllowImportLocal bool // Allow migrate repository by local path
 
 	// true: the user is not allowed to log in Web UI. Git/SSH access could still be allowed (please refer to Git/SSH access related code/documents)
 	ProhibitLogin bool `xorm:"NOT NULL DEFAULT false"`
@@ -126,22 +100,8 @@ type User struct {
 	AvatarEmail     string `xorm:"NOT NULL"`
 	UseCustomAvatar bool
 
-	// Counters
-	NumFollowers int
-	NumFollowing int `xorm:"NOT NULL DEFAULT 0"`
-	NumStars     int
-	NumRepos     int
-
-	// For organization
-	NumTeams                  int
-	NumMembers                int
-	Visibility                structs.VisibleType `xorm:"NOT NULL DEFAULT 0"`
-	RepoAdminChangeTeamAccess bool                `xorm:"NOT NULL DEFAULT false"`
-
 	// Preferences
-	DiffViewStyle       string `xorm:"NOT NULL DEFAULT ''"`
-	Theme               string `xorm:"NOT NULL DEFAULT ''"`
-	KeepActivityPrivate bool   `xorm:"NOT NULL DEFAULT false"`
+	Theme string `xorm:"NOT NULL DEFAULT ''"`
 }
 
 // Meta defines the meta information of a user, to be stored in the K/V table
@@ -171,10 +131,6 @@ func (u *User) LogString() string {
 
 // BeforeUpdate is invoked from XORM before updating this object.
 func (u *User) BeforeUpdate() {
-	if u.MaxRepoCreation < -1 {
-		u.MaxRepoCreation = -1
-	}
-
 	// Organization does not need email
 	u.Email = strings.ToLower(u.Email)
 	if len(u.AvatarEmail) == 0 {
@@ -484,9 +440,7 @@ func IsUsableUsername(name string) error {
 // CreateUserOverwriteOptions are an optional options who overwrite system defaults on user creation
 type CreateUserOverwriteOptions struct {
 	KeepEmailPrivate optional.Option[bool]
-	Visibility       *structs.VisibleType
 	Theme            *string
-	IsRestricted     optional.Option[bool]
 	IsActive         optional.Option[bool]
 }
 
@@ -508,10 +462,7 @@ func createUser(ctx context.Context, u *User, meta *Meta, createdByAdmin bool, o
 
 	// set system defaults
 	u.KeepEmailPrivate = setting.Service.DefaultKeepEmailPrivate
-	u.Visibility = setting.Service.DefaultUserVisibilityMode
-	u.MaxRepoCreation = -1
 	u.Theme = setting.UI.DefaultTheme
-	u.IsRestricted = setting.Service.DefaultUserIsRestricted
 	u.IsActive = true
 
 	// Ensure consistency of the dates.
@@ -525,14 +476,8 @@ func createUser(ctx context.Context, u *User, meta *Meta, createdByAdmin bool, o
 		if overwrite.KeepEmailPrivate.Has() {
 			u.KeepEmailPrivate = overwrite.KeepEmailPrivate.Value()
 		}
-		if overwrite.Visibility != nil {
-			u.Visibility = *overwrite.Visibility
-		}
 		if overwrite.Theme != nil {
 			u.Theme = *overwrite.Theme
-		}
-		if overwrite.IsRestricted.Has() {
-			u.IsRestricted = overwrite.IsRestricted.Value()
 		}
 		if overwrite.IsActive.Has() {
 			u.IsActive = overwrite.IsActive.Value()
@@ -715,12 +660,6 @@ func VerifyUserActiveCode(ctx context.Context, code string) (user *User) {
 
 // ValidateUser check if user is valid to insert / update into database
 func ValidateUser(u *User, cols ...string) error {
-	if len(cols) == 0 || util.SliceContainsString(cols, "visibility", true) {
-		if !setting.Service.AllowedUserVisibilityModesSlice.IsAllowedVisibility(u.Visibility) {
-			return fmt.Errorf("visibility Mode not allowed: %s", u.Visibility.String())
-		}
-	}
-
 	return nil
 }
 
@@ -838,32 +777,6 @@ func GetUserEmailsByNames(ctx context.Context, names []string) []string {
 		mails = append(mails, u.Email)
 	}
 	return mails
-}
-
-// GetMaileableUsersByIDs gets users from ids, but only if they can receive mails
-func GetMaileableUsersByIDs(ctx context.Context, ids []int64, isMention bool) ([]*User, error) {
-	if len(ids) == 0 {
-		return nil, nil
-	}
-	ous := make([]*User, 0, len(ids))
-
-	if isMention {
-		return ous, db.GetEngine(ctx).
-			In("id", ids).
-			Where("`type` = ?", UserTypeIndividual).
-			And("`prohibit_login` = ?", false).
-			And("`is_active` = ?", true).
-			In("`email_notifications_preference`", EmailNotificationsEnabled, EmailNotificationsOnMention, EmailNotificationsAndYourOwn).
-			Find(&ous)
-	}
-
-	return ous, db.GetEngine(ctx).
-		In("id", ids).
-		Where("`type` = ?", UserTypeIndividual).
-		And("`prohibit_login` = ?", false).
-		And("`is_active` = ?", true).
-		In("`email_notifications_preference`", EmailNotificationsEnabled, EmailNotificationsAndYourOwn).
-		Find(&ous)
 }
 
 // GetUserNamesByIDs returns usernames for all resolved users from a list of Ids.
@@ -991,105 +904,6 @@ func GetAdminUser(ctx context.Context) (*User, error) {
 	}
 
 	return &admin, nil
-}
-
-func isUserVisibleToViewerCond(viewer *User) builder.Cond {
-	if viewer != nil && viewer.IsAdmin {
-		return builder.NewCond()
-	}
-
-	if viewer == nil || viewer.IsRestricted {
-		return builder.Eq{
-			"`user`.visibility": structs.VisibleTypePublic,
-		}
-	}
-
-	return builder.Neq{
-		"`user`.visibility": structs.VisibleTypePrivate,
-	}.Or(
-		// viewer self
-		builder.Eq{"`user`.id": viewer.ID},
-		// viewer's following
-		builder.In("`user`.id",
-			builder.
-				Select("`follow`.user_id").
-				From("follow").
-				Where(builder.Eq{"`follow`.follow_id": viewer.ID})),
-		// viewer's org user
-		builder.In("`user`.id",
-			builder.
-				Select("`team_user`.uid").
-				From("team_user").
-				Join("INNER", "`team_user` AS t2", "`team_user`.org_id = `t2`.org_id").
-				Where(builder.Eq{"`t2`.uid": viewer.ID})),
-		// viewer's org
-		builder.In("`user`.id",
-			builder.
-				Select("`team_user`.org_id").
-				From("team_user").
-				Where(builder.Eq{"`team_user`.uid": viewer.ID})))
-}
-
-// IsUserVisibleToViewer check if viewer is able to see user profile
-func IsUserVisibleToViewer(ctx context.Context, u, viewer *User) bool {
-	if viewer != nil && (viewer.IsAdmin || viewer.ID == u.ID) {
-		return true
-	}
-
-	switch u.Visibility {
-	case structs.VisibleTypePublic:
-		return true
-	case structs.VisibleTypeLimited:
-		if viewer == nil || viewer.IsRestricted {
-			return false
-		}
-		return true
-	case structs.VisibleTypePrivate:
-		if viewer == nil || viewer.IsRestricted {
-			return false
-		}
-
-		// If they follow - they see each other
-		follower := IsFollowing(ctx, u.ID, viewer.ID)
-		if follower {
-			return true
-		}
-
-		// Now we need to check if they in some organization together
-		count, err := db.GetEngine(ctx).Table("team_user").
-			Where(
-				builder.And(
-					builder.Eq{"uid": viewer.ID},
-					builder.Or(
-						builder.Eq{"org_id": u.ID},
-						builder.In("org_id",
-							builder.Select("org_id").
-								From("team_user", "t2").
-								Where(builder.Eq{"uid": u.ID}))))).
-			Count()
-		if err != nil {
-			return false
-		}
-
-		if count == 0 {
-			// No common organization
-			return false
-		}
-
-		// they are in an organization together
-		return true
-	}
-	return false
-}
-
-// CountWrongUserType count OrgUser who have wrong type
-func CountWrongUserType(ctx context.Context) (int64, error) {
-	return db.GetEngine(ctx).Where(builder.Eq{"type": 0}.And(builder.Neq{"num_teams": 0})).Count(new(User))
-}
-
-// FixWrongUserType fix OrgUser who have wrong type
-func FixWrongUserType(ctx context.Context) (int64, error) {
-	return db.GetEngine(ctx).Where(builder.Eq{"type": 0}.And(builder.Neq{"num_teams": 0})).Cols("type").NoAutoTime().Update(&User{Type: 1})
 }
 
 func GetOrderByName() string {

@@ -71,15 +71,13 @@ func DeleteUser(ctx context.Context, u *user_model.User, purge bool) error {
 		// Disable the user first
 		// NOTE: This is deliberately not within a transaction as it must disable the user immediately to prevent any further action by the user to be purged.
 		if err := user_model.UpdateUserCols(ctx, &user_model.User{
-			ID:              u.ID,
-			IsActive:        false,
-			IsRestricted:    true,
-			IsAdmin:         false,
-			ProhibitLogin:   true,
-			Passwd:          "",
-			Salt:            "",
-			PasswdHashAlgo:  "",
-			MaxRepoCreation: 0,
+			ID:             u.ID,
+			IsActive:       false,
+			IsAdmin:        false,
+			ProhibitLogin:  true,
+			Passwd:         "",
+			Salt:           "",
+			PasswdHashAlgo: "",
 		}, "is_active", "is_restricted", "is_admin", "prohibit_login", "max_repo_creation", "passwd", "salt", "passwd_hash_algo"); err != nil {
 			return fmt.Errorf("unable to disable user: %s[%d] prior to purge. UpdateUserCols: %w", u.Name, u.ID, err)
 		}
