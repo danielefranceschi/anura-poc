@@ -167,16 +167,10 @@ func (w *Webhook) UpdateEvent() error {
 	return err
 }
 
-// HasCreateEvent returns true if hook enabled create event.
-func (w *Webhook) HasCreateEvent() bool {
+// HasRepositoryEvent returns if hook enabled repository event.
+func (w *Webhook) HasRepositoryEvent() bool {
 	return w.SendEverything ||
-		(w.ChooseEvents && w.HookEvents.Create)
-}
-
-// HasDeleteEvent returns true if hook enabled delete event.
-func (w *Webhook) HasDeleteEvent() bool {
-	return w.SendEverything ||
-		(w.ChooseEvents && w.HookEvents.Delete)
+		(w.ChooseEvents && w.HookEvents.Repository)
 }
 
 // HasPackageEvent returns if hook enabled package event.
@@ -194,8 +188,7 @@ func (w *Webhook) EventCheckers() []struct {
 		Has  func() bool
 		Type webhook_module.HookEventType
 	}{
-		{w.HasCreateEvent, webhook_module.HookEventCreate},
-		{w.HasDeleteEvent, webhook_module.HookEventDelete},
+		{w.HasRepositoryEvent, webhook_module.HookEventRepository},
 		{w.HasPackageEvent, webhook_module.HookEventPackage},
 	}
 }
@@ -292,16 +285,16 @@ func GetWebhookByOwnerID(ctx context.Context, ownerID, id int64) (*Webhook, erro
 // ListWebhookOptions are options to filter webhooks on ListWebhooksByOpts
 type ListWebhookOptions struct {
 	db.ListOptions
-	RepoID   int64
+	// RepoID   int64
 	OwnerID  int64
 	IsActive optional.Option[bool]
 }
 
 func (opts ListWebhookOptions) ToConds() builder.Cond {
 	cond := builder.NewCond()
-	if opts.RepoID != 0 {
-		cond = cond.And(builder.Eq{"webhook.repo_id": opts.RepoID})
-	}
+	// if opts.RepoID != 0 {
+	// 	cond = cond.And(builder.Eq{"webhook.repo_id": opts.RepoID})
+	// }
 	if opts.OwnerID != 0 {
 		cond = cond.And(builder.Eq{"webhook.owner_id": opts.OwnerID})
 	}

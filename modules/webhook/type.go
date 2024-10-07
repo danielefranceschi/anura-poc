@@ -8,18 +8,15 @@ type HookEventType string
 
 // Types of hook events
 const (
-	HookEventCreate  HookEventType = "create"
-	HookEventDelete  HookEventType = "delete"
-	HookEventPackage HookEventType = "package"
+	HookEventRepository HookEventType = "repository"
+	HookEventPackage    HookEventType = "package"
 )
 
 // Event returns the HookEventType as an event string
 func (h HookEventType) Event() string {
 	switch h {
-	case HookEventCreate:
-		return "create"
-	case HookEventDelete:
-		return "delete"
+	case HookEventRepository:
+		return "repository"
 	case HookEventPackage:
 		return "package"
 	}

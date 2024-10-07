@@ -93,8 +93,8 @@ func addHook(ctx *context.APIContext, form *api.CreateHookOption, ownerID, repoI
 		HookEvent: &webhook_module.HookEvent{
 			ChooseEvents: true,
 			HookEvents: webhook_module.HookEvents{
-				Create: util.SliceContainsString(form.Events, string(webhook_module.HookEventCreate), true),
-				Delete: util.SliceContainsString(form.Events, string(webhook_module.HookEventDelete), true),
+				Repository: util.SliceContainsString(form.Events, string(webhook_module.HookEventRepository), true),
+				Package:    util.SliceContainsString(form.Events, string(webhook_module.HookEventPackage), true),
 			},
 		},
 		IsActive: form.Active,
@@ -203,8 +203,8 @@ func editHook(ctx *context.APIContext, form *api.EditHookOption, w *webhook.Webh
 	}
 	w.SendEverything = false
 	w.ChooseEvents = true
-	w.Create = util.SliceContainsString(form.Events, string(webhook_module.HookEventCreate), true)
-	w.Delete = util.SliceContainsString(form.Events, string(webhook_module.HookEventDelete), true)
+	w.Repository = util.SliceContainsString(form.Events, string(webhook_module.HookEventRepository), true)
+	w.Package = util.SliceContainsString(form.Events, string(webhook_module.HookEventPackage), true)
 
 	err := w.SetHeaderAuthorization(form.AuthorizationHeader)
 	if err != nil {

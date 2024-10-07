@@ -5,9 +5,8 @@ package webhook
 
 // HookEvents is a set of web hook events
 type HookEvents struct {
-	Create  bool `json:"create"`
-	Delete  bool `json:"delete"`
-	Package bool `json:"package"`
+	Repository bool `json:"repository"`
+	Package    bool `json:"package"`
 }
 
 // HookEvent represents events that will delivery hook.

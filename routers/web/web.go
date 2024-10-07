@@ -27,6 +27,7 @@ import (
 	"code.gitea.io/gitea/routers/web/explore"
 	"code.gitea.io/gitea/routers/web/healthcheck"
 	"code.gitea.io/gitea/routers/web/misc"
+	repo_setting "code.gitea.io/gitea/routers/web/repo/setting"
 	"code.gitea.io/gitea/routers/web/user"
 	user_setting "code.gitea.io/gitea/routers/web/user/setting"
 	"code.gitea.io/gitea/routers/web/user/setting/security"
@@ -326,18 +327,18 @@ func registerRoutes(m *web.Router) {
 		}
 	}
 
-	// addWebhookAddRoutes := func() {
-	// 	m.Get("/{type}/new", repo_setting.WebhooksNew)
-	// 	m.Post("/slack/new", web.Bind(forms.NewSlackHookForm{}), repo_setting.SlackHooksNewPost)
-	// 	m.Post("/discord/new", web.Bind(forms.NewDiscordHookForm{}), repo_setting.DiscordHooksNewPost)
-	// 	m.Post("/msteams/new", web.Bind(forms.NewMSTeamsHookForm{}), repo_setting.MSTeamsHooksNewPost)
-	// }
+	addWebhookAddRoutes := func() {
+		m.Get("/{type}/new", repo_setting.WebhooksNew)
+		m.Post("/slack/new", web.Bind(forms.NewSlackHookForm{}), repo_setting.SlackHooksNewPost)
+		m.Post("/discord/new", web.Bind(forms.NewDiscordHookForm{}), repo_setting.DiscordHooksNewPost)
+		m.Post("/msteams/new", web.Bind(forms.NewMSTeamsHookForm{}), repo_setting.MSTeamsHooksNewPost)
+	}
 
-	// addWebhookEditRoutes := func() {
-	// 	m.Post("/slack/{id}", web.Bind(forms.NewSlackHookForm{}), repo_setting.SlackHooksEditPost)
-	// 	m.Post("/discord/{id}", web.Bind(forms.NewDiscordHookForm{}), repo_setting.DiscordHooksEditPost)
-	// 	m.Post("/msteams/{id}", web.Bind(forms.NewMSTeamsHookForm{}), repo_setting.MSTeamsHooksEditPost)
-	// }
+	addWebhookEditRoutes := func() {
+		m.Post("/slack/{id}", web.Bind(forms.NewSlackHookForm{}), repo_setting.SlackHooksEditPost)
+		m.Post("/discord/{id}", web.Bind(forms.NewDiscordHookForm{}), repo_setting.DiscordHooksEditPost)
+		m.Post("/msteams/{id}", web.Bind(forms.NewMSTeamsHookForm{}), repo_setting.MSTeamsHooksEditPost)
+	}
 
 	// FIXME: not all routes need go through same middleware.
 	// Especially some AJAX requests, we can reduce middleware number to improve performance.
@@ -573,12 +574,12 @@ func registerRoutes(m *web.Router) {
 			m.Post("/delete", admin.DeleteDefaultOrSystemWebhook)
 			m.Group("/{id}", func() {
 			})
-			//addWebhookEditRoutes()
+			addWebhookEditRoutes()
 		}, webhooksEnabled)
 
-		// m.Group("/{configType:default-hooks|system-hooks}", func() {
-		// 	addWebhookAddRoutes()
-		// })
+		m.Group("/{configType:default-hooks|system-hooks}", func() {
+			addWebhookAddRoutes()
+		})
 
 		m.Group("/auths", func() {
 			m.Get("", admin.Authentications)

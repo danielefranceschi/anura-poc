@@ -125,7 +125,7 @@ func PrepareWebhooks(ctx context.Context, source EventSource, event webhook_modu
 
 	if source.Repository != nil {
 		repoHooks, err := db.Find[webhook_model.Webhook](ctx, webhook_model.ListWebhookOptions{
-			RepoID:   0, //source.Repository.ID,
+			//RepoID:  source.Repository.ID,
 			IsActive: optional.Some(true),
 		})
 		if err != nil {
