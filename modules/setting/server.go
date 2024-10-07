@@ -34,10 +34,9 @@ type LandingPage string
 
 // enumerates all the landing page types
 const (
-	LandingPageHome          LandingPage = "/"
-	LandingPageExplore       LandingPage = "/explore"
-	LandingPageOrganizations LandingPage = "/explore/organizations"
-	LandingPageLogin         LandingPage = "/user/login"
+	LandingPageHome    LandingPage = "/"
+	LandingPageExplore LandingPage = "/explore"
+	LandingPageLogin   LandingPage = "/user/login"
 )
 
 // Server settings
@@ -336,8 +335,6 @@ func loadServerFrom(rootCfg ConfigProvider) {
 	switch landingPage {
 	case "explore":
 		LandingPageURL = LandingPageExplore
-	case "organizations":
-		LandingPageURL = LandingPageOrganizations
 	case "login":
 		LandingPageURL = LandingPageLogin
 	case "", "home":
