@@ -18,9 +18,9 @@ Right now it builds, starts, and shows most of the admin interfaces.
 
 ## (initial) roadmap
 
+- [ ] switch to CGO=0 goreleaser builds (use https://gitlab.com/cznic/sqlite)
 - [ ] add artifact repository model
 - [ ] add artifact repository API
 - [ ] dynamic routes for repos
 - [ ] add artifact repository UI
 - [ ] reduce devcontainer clutter
-- [ ] switch to goreleaser builds
