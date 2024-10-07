@@ -73,7 +73,7 @@ func getOwnerRepoCtx(ctx *context.Context) (*ownerRepoCtx, error) {
 		}, nil
 	}
 
-	if ctx.Data["PageIsAdmin"] == true {
+	if ctx.Data["PageIsAdmin"] == true || ctx.Data["IsAdmin"] == true {
 		return &ownerRepoCtx{
 			IsAdmin:         true,
 			IsSystemWebhook: ctx.PathParam(":configType") == "system-hooks",
@@ -83,7 +83,7 @@ func getOwnerRepoCtx(ctx *context.Context) (*ownerRepoCtx, error) {
 		}, nil
 	}
 
-	return nil, errors.New("unable to set OwnerRepo context")
+	return nil, errors.New("unable to set OwnerRepo context: " + fmt.Sprintf("%v", ctx.Data))
 }
 
 func checkHookType(ctx *context.Context) string {

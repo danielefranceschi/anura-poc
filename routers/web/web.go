@@ -472,6 +472,17 @@ func registerRoutes(m *web.Router) {
 			Post(web.Bind(forms.NewAccessTokenForm{}), user_setting.ApplicationsPost)
 		m.Post("/applications/delete", user_setting.DeleteApplication)
 
+		m.Group("/hooks", func() {
+			m.Get("", user_setting.Webhooks)
+			m.Post("/delete", user_setting.DeleteWebhook)
+			addWebhookAddRoutes()
+			m.Group("/{id}", func() {
+				m.Get("", repo_setting.WebHooksEdit)
+				m.Post("/replay/{uuid}", repo_setting.ReplayWebhook)
+			})
+			addWebhookEditRoutes()
+		}, webhooksEnabled)
+
 		m.Group("/packages", func() {
 			m.Get("", user_setting.Packages)
 			m.Group("/rules", func() {
