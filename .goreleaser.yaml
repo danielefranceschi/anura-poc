@@ -38,10 +38,16 @@ builds:
       - -v
       - -tags={{.Env.DEFTAGS}}
     gcflags:
-      - all=-trimpath={{.Env.GOPATH}}
+      - all=-l -B
       - ./dontoptimizeme=-N
     ldflags:
       - -s -w -X "main.Version={{.Version}}" -X "main.Tags={{.Env.DEFTAGS}}"
+
+upx:
+  - enabled: false
+    goos: [ linux, windows ]
+    compress: best
+    lzma: true
 
 archives:
   - format: tar.gz
