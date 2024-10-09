@@ -27,14 +27,14 @@ import (
 // CmdDump represents the available dump sub-command.
 var CmdDump = &cli.Command{
 	Name:        "dump",
-	Usage:       "Dump Gitea files and database",
-	Description: `Dump compresses all related files and database into zip file. It can be used for backup and capture Gitea server image to send to maintainer`,
+	Usage:       "Dump Anura files and database",
+	Description: `Dump compresses all related files and database into zip file. It can be used for backup and capture Anura server image to send to maintainer`,
 	Action:      runDump,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "file",
 			Aliases: []string{"f"},
-			Usage:   `Name of the dump file which will be created, default to "gitea-dump-{time}.zip". Supply '-' for stdout. See type for available types.`,
+			Usage:   `Name of the dump file which will be created, default to "anura-dump-{time}.zip". Supply '-' for stdout. See type for available types.`,
 		},
 		&cli.BoolFlag{
 			Name:    "verbose",

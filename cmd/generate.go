@@ -18,7 +18,7 @@ var (
 	// CmdGenerate represents the available generate sub-command.
 	CmdGenerate = &cli.Command{
 		Name:  "generate",
-		Usage: "Generate Gitea's secrets/keys/tokens",
+		Usage: "Generate Anura's secrets/keys/tokens",
 		Subcommands: []*cli.Command{
 			subcmdSecret,
 		},

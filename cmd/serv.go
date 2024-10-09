@@ -19,10 +19,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	lfsAuthenticateVerb = "git-lfs-authenticate"
-)
-
 // CmdServ represents the available serv sub-command.
 var CmdServ = &cli.Command{
 	Name:        "serv",
@@ -68,12 +64,12 @@ func fail(ctx context.Context, userMessage, logMsgFmt string, args ...any) error
 	// There appears to be a chance to cause a zombie process and failure to read the Exit status
 	// if nothing is outputted on stdout.
 	_, _ = fmt.Fprintln(os.Stdout, "")
-	_, _ = fmt.Fprintln(os.Stderr, "Gitea:", userMessage)
+	_, _ = fmt.Fprintln(os.Stderr, "Anura:", userMessage)
 
 	if logMsgFmt != "" {
 		logMsg := fmt.Sprintf(logMsgFmt, args...)
 		if !setting.IsProd {
-			_, _ = fmt.Fprintln(os.Stderr, "Gitea:", logMsg)
+			_, _ = fmt.Fprintln(os.Stderr, "Anura:", logMsg)
 		}
 		if userMessage != "" {
 			if unicode.IsPunct(rune(userMessage[len(userMessage)-1])) {
@@ -107,6 +103,6 @@ func runServ(c *cli.Context) error {
 	// FIXME: This needs to internationalised
 	setup(ctx, c.Bool("debug"))
 
-	println("Gitea: SSH has been disabled")
+	println("Anura: SSH has been disabled")
 	return nil
 }

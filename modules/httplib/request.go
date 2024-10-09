@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-var defaultSetting = Settings{"GiteaServer", 60 * time.Second, 60 * time.Second, nil, nil}
+var defaultSetting = Settings{"AnuraServer", 60 * time.Second, 60 * time.Second, nil, nil}
 
 // newRequest returns *Request with specific method
 func newRequest(url, method string) *Request {

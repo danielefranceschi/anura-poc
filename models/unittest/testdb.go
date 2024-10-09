@@ -91,7 +91,7 @@ func MainTest(m *testing.M, testOpts ...*TestOptions) {
 		}
 	}
 	if searchDir == "" {
-		panic("The tests should run in a Gitea repository, there should be a 'go.mod' in the root")
+		panic("The tests should run in an Anura repository, there should be a 'go.mod' in the root")
 	}
 
 	giteaRoot = searchDir

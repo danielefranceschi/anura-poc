@@ -69,7 +69,7 @@ func appGlobalFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:    "work-path",
 			Aliases: []string{"w"},
-			Usage:   "Set Gitea's working path (defaults to the Gitea's binary directory)",
+			Usage:   "Set Anura's working path (defaults to the Anura's binary directory)",
 		},
 	}
 }
@@ -119,10 +119,10 @@ type AppVersion struct {
 
 func NewMainApp(appVer AppVersion) *cli.App {
 	app := cli.NewApp()
-	app.Name = "Gitea"
-	app.HelpName = "gitea"
-	app.Usage = "A painless self-hosted Git service"
-	app.Description = `Gitea program contains "web" and other subcommands. If no subcommand is given, it starts the web server by default. Use "web" subcommand for more web server arguments, use other subcommands for other purposes.`
+	app.Name = "Anura"
+	app.HelpName = "anura"
+	app.Usage = "A painless self-hosted artifact repository"
+	app.Description = `Anura program contains "web" and other subcommands. If no subcommand is given, it starts the web server by default. Use "web" subcommand for more web server arguments, use other subcommands for other purposes.`
 	app.Version = appVer.Version + appVer.Extra
 	app.EnableBashCompletion = true
 

@@ -18,9 +18,18 @@ Right now it builds, starts, and shows most of the admin interfaces.
 
 ## (initial) roadmap
 
-- [ ] switch to CGO=0 goreleaser builds (use https://gitlab.com/cznic/sqlite)
+- [X] always build with sqlite (using https://gitlab.com/cznic/sqlite)
+- [X] goreleaser builds
 - [ ] add artifact repository model
 - [ ] add artifact repository API
 - [ ] dynamic routes for repos
 - [ ] add artifact repository UI
+- [ ] fix tests
 - [ ] reduce devcontainer clutter
+
+## Local build and run
+
+```shell
+goreleaser build --single-target --snapshot --clean
+dist/anura_linux_arm64/anura -C $(pwd)/custom -w $(pwd)
+```

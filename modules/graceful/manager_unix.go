@@ -50,7 +50,7 @@ func (g *Manager) start() {
 
 	g.isChild = len(os.Getenv(listenFDsEnv)) > 0 && os.Getppid() > 1
 
-	g.notify(statusMsg("Starting Gitea"))
+	g.notify(statusMsg("Starting Anura"))
 	g.notify(pidMsg())
 	go g.handleSignals(g.managerCtx)
 

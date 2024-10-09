@@ -17,7 +17,7 @@ func TestSettings(t *testing.T) {
 	keyName := "test_user_setting"
 	assert.NoError(t, unittest.PrepareTestDatabase())
 
-	newSetting := &user_model.Setting{UserID: 99, SettingKey: keyName, SettingValue: "Gitea User Setting Test"}
+	newSetting := &user_model.Setting{UserID: 99, SettingKey: keyName, SettingValue: "Anura User Setting Test"}
 
 	// create setting
 	err := user_model.SetUserSetting(db.DefaultContext, newSetting.UserID, newSetting.SettingKey, newSetting.SettingValue)

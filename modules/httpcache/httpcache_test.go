@@ -15,7 +15,7 @@ import (
 func countFormalHeaders(h http.Header) (c int) {
 	for k := range h {
 		// ignore our headers for internal usage
-		if strings.HasPrefix(k, "X-Gitea-") {
+		if strings.HasPrefix(k, "X-Anura-") {
 			continue
 		}
 		c++
