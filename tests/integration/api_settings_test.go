@@ -36,5 +36,4 @@ func TestAPIExposedSettings(t *testing.T) {
 		DefaultGitTreesPerPage: setting.API.DefaultGitTreesPerPage,
 		DefaultMaxBlobSize:     setting.API.DefaultMaxBlobSize,
 	}, apiSettings)
-
 }

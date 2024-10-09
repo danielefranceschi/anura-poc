@@ -356,5 +356,4 @@ func loadRepositoryFrom(rootCfg ConfigProvider) {
 	if !filepath.IsAbs(Repository.Upload.TempPath) {
 		Repository.Upload.TempPath = path.Join(AppWorkPath, Repository.Upload.TempPath)
 	}
-
 }

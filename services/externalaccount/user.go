@@ -45,11 +45,7 @@ func LinkAccountToUser(ctx context.Context, user *user_model.User, gothUser goth
 		return err
 	}
 
-	if err := user_model.LinkExternalToUser(ctx, user, externalLoginUser); err != nil {
-		return err
-	}
-
-	return nil
+	return user_model.LinkExternalToUser(ctx, user, externalLoginUser)
 }
 
 // EnsureLinkExternalToUser link the gothUser to the user

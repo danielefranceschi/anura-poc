@@ -53,7 +53,6 @@ func InitializeIndexRepository(ctx context.Context, doer, owner *user_model.User
 }
 
 func RebuildIndex(ctx context.Context, doer, owner *user_model.User) error {
-
 	/*
 		ps, err := packages_model.GetPackagesByType(ctx, owner.ID, packages_model.TypeCargo)
 		if err != nil {

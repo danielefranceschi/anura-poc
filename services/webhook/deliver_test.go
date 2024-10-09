@@ -150,7 +150,6 @@ func TestWebhookDeliverHookTask(t *testing.T) {
 
 		assert.True(t, hookTask.IsSucceed)
 	})
-
 }
 
 func TestWebhookDeliverSpecificTypes(t *testing.T) {

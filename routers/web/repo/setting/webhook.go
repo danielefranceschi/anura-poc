@@ -63,7 +63,6 @@ type ownerRepoCtx struct {
 
 // getOwnerRepoCtx determines whether this is a repo, owner, or admin (both default and system) context.
 func getOwnerRepoCtx(ctx *context.Context) (*ownerRepoCtx, error) {
-
 	if ctx.Data["PageIsUserSettings"] == true {
 		return &ownerRepoCtx{
 			OwnerID:     ctx.Doer.ID,

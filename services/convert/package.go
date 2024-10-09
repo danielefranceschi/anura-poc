@@ -13,7 +13,6 @@ import (
 
 // ToPackage convert a packages.PackageDescriptor to api.Package
 func ToPackage(ctx context.Context, pd *packages.PackageDescriptor, doer *user_model.User) (*api.Package, error) {
-
 	return &api.Package{
 		ID:    pd.Version.ID,
 		Owner: ToUser(ctx, pd.Owner, doer),

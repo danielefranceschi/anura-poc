@@ -173,7 +173,6 @@ func testPackageCargo(t *testing.T, _ *neturl.URL) {
 			MakeRequest(t, req, http.StatusConflict)
 
 			t.Run("Index", func(t *testing.T) {
-
 				t.Run("HTTP", func(t *testing.T) {
 					t.Run("Entry", func(t *testing.T) {
 						defer tests.PrintCurrentTest(t)()

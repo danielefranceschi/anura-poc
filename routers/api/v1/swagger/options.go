@@ -13,7 +13,6 @@ import (
 // parameterBodies
 // swagger:response parameterBodies
 type swaggerParameterBodies struct {
-
 	// in:body
 	CreateEmailOption api.CreateEmailOption
 	// in:body

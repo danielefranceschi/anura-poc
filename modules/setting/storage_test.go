@@ -41,7 +41,6 @@ STORAGE_TYPE = minio
 	assert.EqualValues(t, "minio", Avatar.Storage.Type)
 	assert.EqualValues(t, "gitea", Avatar.Storage.MinioConfig.Bucket)
 	assert.EqualValues(t, "avatars/", Avatar.Storage.MinioConfig.BasePath)
-
 }
 
 func Test_getStorageInheritStorageTypeAzureBlob(t *testing.T) {

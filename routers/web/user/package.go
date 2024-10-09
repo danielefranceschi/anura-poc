@@ -399,7 +399,6 @@ func PackageSettingsPost(ctx *context.Context) {
 
 	form := web.GetForm(ctx).(*forms.PackageSettingForm)
 	switch form.Action {
-
 	case "delete":
 		err := packages_service.RemovePackageVersion(ctx, ctx.Doer, ctx.Package.Descriptor.Version)
 		if err != nil {

@@ -31,8 +31,8 @@ type APIContext struct {
 
 	ContextUser *user_model.User // the user which is being visited, in most cases it differs from Doer
 
-	//Repo    *Repository
-	//Org     *APIOrganization
+	// Repo    *Repository
+	// Org     *APIOrganization
 	Package *Package
 }
 

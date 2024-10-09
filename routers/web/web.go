@@ -620,7 +620,6 @@ func registerRoutes(m *web.Router) {
 				return
 			}
 		})
-
 	}, adminReq, ctxDataSet("EnableOAuth2", setting.OAuth2.Enabled, "EnablePackages", setting.Packages.Enabled))
 	// ***** END: Admin *****
 

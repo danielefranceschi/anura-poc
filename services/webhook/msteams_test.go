@@ -41,7 +41,6 @@ func TestMSTeamsPayload(t *testing.T) {
 		assert.Len(t, pl.PotentialAction[0].Targets, 1)
 		assert.Equal(t, "http://localhost:3000/user1/-/packages/container/GiteaContainer/latest", pl.PotentialAction[0].Targets[0].URI)
 	})
-
 }
 
 func TestMSTeamsJSONPayload(t *testing.T) {

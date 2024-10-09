@@ -19,8 +19,8 @@ type Task struct {
 	ID     int64
 	DoerID int64            `xorm:"index"` // operator
 	Doer   *user_model.User `xorm:"-"`
-	//RepoID         int64                  `xorm:"index"`
-	//Repo           *repo_model.Repository `xorm:"-"`
+	// RepoID         int64                  `xorm:"index"`
+	// Repo           *repo_model.Repository `xorm:"-"`
 	Type           structs.TaskType
 	Status         structs.TaskStatus `xorm:"index"`
 	StartTime      timeutil.TimeStamp

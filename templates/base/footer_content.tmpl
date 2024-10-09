@@ -3,7 +3,7 @@
 		{{if ShowFooterPoweredBy}}
 			<a target="_blank" rel="noopener noreferrer" href="https://about.gitea.com">{{ctx.Locale.Tr "powered_by" "Anura"}}</a>
 		{{end}}
-		{{if .ShowFooterVersion }}
+		{{if .ShowFooterVersion}}
 			{{ctx.Locale.Tr "version"}}: <strong>{{AppVer}}</strong>
 		{{end}}
 		{{if and .TemplateLoadTimes ShowFooterTemplateLoadTime}}

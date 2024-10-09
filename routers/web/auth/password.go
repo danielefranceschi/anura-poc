@@ -22,10 +22,8 @@ import (
 	user_service "code.gitea.io/gitea/services/user"
 )
 
-var (
-	// tplMustChangePassword template for updating a user's password
-	tplMustChangePassword base.TplName = "user/auth/change_passwd"
-)
+// tplMustChangePassword template for updating a user's password
+var tplMustChangePassword base.TplName = "user/auth/change_passwd"
 
 func commonResetPassword(ctx *context.Context) (*user_model.User, *auth.TwoFactor) {
 	code := ctx.FormString("code")

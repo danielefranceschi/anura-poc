@@ -30,5 +30,4 @@ func init() {
 		Run:       checkScriptType,
 		Priority:  5,
 	})
-
 }

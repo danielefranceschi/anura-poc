@@ -92,7 +92,6 @@ func TestReplacePrimaryEmailAddress(t *testing.T) {
 
 		assert.NoError(t, ReplacePrimaryEmailAddress(db.DefaultContext, user, "primary-13@example.com"))
 	})
-
 }
 
 func TestAddEmailAddresses(t *testing.T) {

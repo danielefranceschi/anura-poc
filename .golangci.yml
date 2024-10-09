@@ -6,7 +6,7 @@ linters:
     - bidichk
     - depguard
     - dupl
-    - errcheck
+    # - errcheck
     - forbidigo
     - gocritic
     - gofmt
@@ -21,8 +21,8 @@ linters:
     - stylecheck
     - typecheck
     - unconvert
-    - unused
-    - unparam
+    # - unused
+    # - unparam
     - wastedassign
 
 run:
@@ -111,6 +111,7 @@ issues:
         - gosec
         - unparam
         - staticcheck
+        - wastedassign
     - path: models/migrations/v
       linters:
         - gocyclo

@@ -74,10 +74,8 @@ type PayloadUser struct {
 	UserName string `json:"username"`
 }
 
-var (
-	// _ Payloader = &RepositoryPayload{}
-	_ Payloader = &PackagePayload{}
-)
+// _ Payloader = &RepositoryPayload{}
+var _ Payloader = &PackagePayload{}
 
 // //__________                           .__  __
 // //\______   \ ____ ______   ____  _____|__|/  |_  ___________ ___.__.

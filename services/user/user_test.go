@@ -30,7 +30,6 @@ func TestDeleteUser(t *testing.T) {
 
 		err := DeleteUser(db.DefaultContext, user, false)
 		assert.Error(t, err)
-		return
 	}
 
 	test(2)
@@ -130,7 +129,6 @@ func TestRenameUser(t *testing.T) {
 		redirectUID, err := user_model.LookupUserRedirect(db.DefaultContext, oldUsername)
 		assert.NoError(t, err)
 		assert.EqualValues(t, user.ID, redirectUID)
-
 	})
 }
 

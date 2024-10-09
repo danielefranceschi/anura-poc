@@ -4,7 +4,7 @@
 package setting
 
 import (
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // Import for SQLite3 support
 )
 
 func init() {

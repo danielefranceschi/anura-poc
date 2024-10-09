@@ -33,7 +33,6 @@ func TestDiscordPayload(t *testing.T) {
 		assert.Equal(t, setting.AppURL+p.Sender.UserName, pl.Embeds[0].Author.URL)
 		assert.Equal(t, p.Sender.AvatarURL, pl.Embeds[0].Author.IconURL)
 	})
-
 }
 
 func TestDiscordJSONPayload(t *testing.T) {

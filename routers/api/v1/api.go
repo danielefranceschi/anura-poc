@@ -409,7 +409,6 @@ func Routes() *web.Router {
 						Post(bind(api.CreateAccessTokenOption{}), reqToken(), user.CreateAccessToken)
 					m.Combo("/{id}").Delete(reqToken(), user.DeleteAccessToken)
 				}, reqSelfOrAdmin(), reqBasicOrRevProxyAuth())
-
 			}, context.UserAssignmentAPI())
 		}, tokenRequiresScopes(auth_model.AccessTokenScopeCategoryUser))
 
@@ -436,7 +435,6 @@ func Routes() *web.Router {
 				m.Post("", bind(api.UpdateUserAvatarOption{}), user.UpdateAvatar)
 				m.Delete("", user.DeleteAvatar)
 			})
-
 		}, tokenRequiresScopes(auth_model.AccessTokenScopeCategoryUser), reqToken())
 
 		m.Group("/admin", func() {
@@ -465,7 +463,6 @@ func Routes() *web.Router {
 					Delete(admin.DeleteHook)
 			})
 		}, tokenRequiresScopes(auth_model.AccessTokenScopeCategoryAdmin), reqToken(), reqSiteAdmin())
-
 	}, sudo())
 
 	return m

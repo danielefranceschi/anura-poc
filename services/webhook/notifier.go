@@ -52,7 +52,7 @@ func (m *webhookNotifier) PackageDelete(ctx context.Context, doer *user_model.Us
 
 func notifyPackage(ctx context.Context, sender *user_model.User, pd *packages_model.PackageDescriptor, action api.HookPackageAction) {
 	source := EventSource{
-		Repository: nil, //pd.Repository,
+		Repository: nil, // pd.Repository,
 		Owner:      pd.Owner,
 	}
 
