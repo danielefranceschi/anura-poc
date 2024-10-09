@@ -116,3 +116,5 @@ prime/
 
 # Manpage
 /man
+
+dist/

@@ -46,7 +46,7 @@ func InitFixtures(opts FixturesOptions, engine ...*xorm.Engine) (err error) {
 	case schemas.MSSQL:
 		dialect = "mssql"
 	case schemas.SQLITE:
-		dialect = "sqlite3"
+		dialect = "sqlite"
 	default:
 		fmt.Println("Unsupported RDBMS for integration tests")
 		os.Exit(1)

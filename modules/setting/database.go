@@ -115,12 +115,12 @@ func DBConnStr() (string, error) {
 	case "mssql":
 		host, port := ParseMSSQLHostPort(Database.Host)
 		connStr = fmt.Sprintf("server=%s; port=%s; database=%s; user id=%s; password=%s;", host, port, Database.Name, Database.User, Database.Passwd)
-	case "sqlite3":
+	case "sqlite", "sqlite3":
 		if !EnableSQLite3 {
 			return "", errors.New("this Gitea binary was not built with SQLite3 support")
 		}
 		if err := os.MkdirAll(filepath.Dir(Database.Path), os.ModePerm); err != nil {
-			return "", fmt.Errorf("Failed to create directories: %w", err)
+			return "", fmt.Errorf("failed to create directories: %w", err)
 		}
 		journalMode := ""
 		if Database.SQLiteJournalMode != "" {
@@ -209,7 +209,7 @@ func (t DatabaseType) String() string {
 }
 
 func (t DatabaseType) IsSQLite3() bool {
-	return t == "sqlite3"
+	return t == "sqlite" || t == "sqlite3"
 }
 
 func (t DatabaseType) IsMySQL() bool {
