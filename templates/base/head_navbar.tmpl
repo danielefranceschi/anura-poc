@@ -36,6 +36,9 @@
 			{{/* No links */}}
 		{{else if .IsSigned}}
 			<a class="item{{if .PageIsExplore}} active{{end}}" href="{{AppSubUrl}}/explore/repos">{{ctx.Locale.Tr "explore"}}</a>
+			{{if .IsAdmin}}
+			<a class="item {{if .PageIsAdmin}}active {{end}}" href="{{AppSubUrl}}/admin">{{ctx.Locale.Tr "admin_panel"}}</a>
+			{{end}}
 		{{else}}
 			<a class="item{{if .PageIsExplore}} active{{end}}" href="{{AppSubUrl}}/explore/repos">{{ctx.Locale.Tr "explore"}}</a>
 		{{end}}
